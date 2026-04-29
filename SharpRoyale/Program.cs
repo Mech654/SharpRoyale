@@ -4,11 +4,16 @@ using SharpRoyale.Services;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
+using SharpRoyale.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<TokenService>();
+builder.Services.AddSingleton<LobbyService>();
+builder.Services.AddSingleton<MatchNotifier>();
+builder.Services.AddHostedService<MatchmakingWorker>();
+
 builder.Services.AddControllers();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
