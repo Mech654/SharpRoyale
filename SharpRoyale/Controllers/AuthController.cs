@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SharpRoyale.Services;
 using Models = SharpRoyale.Models;
 
 namespace SharpRoyale.Controllers;
