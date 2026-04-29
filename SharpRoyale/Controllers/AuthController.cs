@@ -14,7 +14,14 @@ public class AuthController(TokenService tokenService) : ControllerBase
     {
         // We assume a successful db verification here and proceed
         var token = tokenService.GenerateToken(request.Username);
-        return Ok( new {Token = token});
+        Response.Cookies.Append("access_token", token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = false, 
+            SameSite = SameSiteMode.Lax, 
+            Expires = DateTimeOffset.UtcNow.AddHours(1)
+        });
+        return Ok();
     }
     
     [HttpPost("register")]
