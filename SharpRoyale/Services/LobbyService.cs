@@ -1,25 +1,27 @@
 ﻿using System.Collections.Concurrent;
+using SharpRoyale.Entities;
+using SharpRoyale.Infrastructure;
 
 namespace SharpRoyale.Services;
 
 public class LobbyService
 {
-    private readonly ConcurrentQueue<string> _queue = new();
-    private readonly object _lock = new();
+    private readonly ConcurrentQueue<int> _queue = new();
+    private readonly Lock _lock = new();
     
-    public void JoinQueue(string playerId)
+    public void JoinQueue(int playerId)
     {
         _queue.Enqueue(playerId);
         
     }
 
-    public void RemoveFromQueue(string playerId)
+    public void RemoveFromQueue(int playerId)
     {
         _queue.TryDequeue(out _);
         
     }
     // TODO: Implement Better Matchmaking Logic, Elo Based.
-    public bool TryGetMatch(out (string p1, string p2)? match)
+    public bool TryMatching(out (Player p1, Player p2)? match)
     {
         lock (_lock)
         {
@@ -32,7 +34,7 @@ public class LobbyService
             if (_queue.TryDequeue(out var p1) &&
                 _queue.TryDequeue(out var p2))
             {
-                match = (p1, p2);
+                match = (DbHelper.GetPlayerFromId(p1), DbHelper.GetPlayerFromId(p2));
                 return true;
             }
         }

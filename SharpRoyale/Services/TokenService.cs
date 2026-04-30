@@ -15,7 +15,7 @@ public class TokenService(IConfiguration config)
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, username),
+            new Claim(ClaimTypes.NameIdentifier, DbHelper.GetPlayerIdFromUsername(username).ToString()),
         };
 
         var token = new JwtSecurityToken(

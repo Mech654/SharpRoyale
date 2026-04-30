@@ -4,24 +4,24 @@ namespace SharpRoyale.Infrastructure;
 
 public class MatchNotifier
 {
-    private readonly ConcurrentDictionary<string, HttpResponse> _clients = new();
+    private readonly ConcurrentDictionary<int, HttpResponse> _clients = new();
 
-    public void Register(string playerId, HttpResponse response)
+    public void Register(int playerId, HttpResponse response)
     {
         _clients[playerId] = response;
     }
 
-    public void Unregister(string playerId)
+    public void Unregister(int playerId)
     {
         _clients.TryRemove(playerId, out _);
     }
 
-    public async Task NotifyMatch(string p1, string p2)
+    public async Task NotifyMatch(Player p1, Player p2)
     {
-        if (_clients.TryGetValue(p1, out var r1))
+        if (_clients.TryGetValue(p1.PlayerId, out var r1))
             await WriteSse(r1, $"Matched with {p2}");
 
-        if (_clients.TryGetValue(p2, out var r2))
+        if (_clients.TryGetValue(p2.PlayerId, out var r2))
             await WriteSse(r2, $"Matched with {p1}");
     }
 
