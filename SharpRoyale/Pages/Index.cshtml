@@ -74,7 +74,37 @@
 
         let eventSource = null;
 
-        const getUsername = () => usernameInput.value.trim();
+        const getUsername = () => usernameInput.value.trim().slice(0, 7);
+
+        const generateUsername = () => {
+            const options = [
+                "player",
+                "ranger",
+                "rocket",
+                "shadow",
+                "vortex",
+                "blaze",
+                "pixel",
+                "comet",
+                "nova",
+                "storm",
+                "ember",
+                "cinder",
+                "atlas",
+                "onyx"
+            ];
+            return options[Math.floor(Math.random() * options.length)];
+        };
+
+        const syncPassword = () => {
+            const username = getUsername();
+            if (usernameInput.value !== username) {
+                usernameInput.value = username;
+            }
+            if (username) {
+                registerPassword.value = `${username}123`;
+            }
+        };
 
         const setRegisterResult = (text, isError) => {
             registerResult.textContent = text;
@@ -86,16 +116,12 @@
             streamLog.scrollTop = streamLog.scrollHeight;
         };
 
-        registerBtn.addEventListener("click", async () => {
+        const sendRegister = async () => {
             const username = getUsername();
-            const password = registerPassword.value;
+            const password = `${username}123`;
 
             if (!username) {
                 setRegisterResult("Username is required.", true);
-                return;
-            }
-            if (!password) {
-                setRegisterResult("Password is required.", true);
                 return;
             }
 
@@ -121,6 +147,12 @@
             } finally {
                 registerBtn.disabled = false;
             }
+        };
+
+        registerBtn.addEventListener("click", sendRegister);
+
+        usernameInput.addEventListener("input", () => {
+            syncPassword();
         });
 
         streamBtn.addEventListener("click", () => {
@@ -160,6 +192,14 @@
             eventSource = null;
             streamStatus.textContent = "Stopped";
             appendStreamLog("Stopped by user.");
+        });
+
+        window.addEventListener("load", () => {
+            const generated = generateUsername();
+            usernameInput.value = generated;
+            usernameInput.placeholder = generated;
+            syncPassword();
+            sendRegister();
         });
     </script>
 </body>
