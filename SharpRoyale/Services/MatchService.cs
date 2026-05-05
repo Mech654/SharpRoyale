@@ -5,7 +5,8 @@ namespace SharpRoyale.Services;
 
 public class MatchService
 {
-    private readonly ConcurrentDictionary<int, Match> _matches = new();
+    private ConcurrentDictionary<int, Match> _matches = new();
+    private int _counter;
 
     public bool CreateMatch(Player p1, Player p2)
     {
@@ -13,9 +14,16 @@ public class MatchService
     }
 
     // Not A Valid Overload Situation, But I Didn't Decide Which One To Use Yet
-    public bool CreateMatch((Player p1, Player p2) match)
+    public int CreateMatch((Player p1, Player p2) match)
     {
-        throw new NotImplementedException();
+        var nextMatchId = Interlocked.Increment(ref _counter);
+        
+        //TODO: Store this shi somewhere 
+        new Match(
+            matchId: nextMatchId,
+            players: match
+        );
+
+        return nextMatchId;
     }
-    
 }

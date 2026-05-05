@@ -18,7 +18,5 @@ public static class DbHelper
     }
 
     public static int GetPlayerIdFromUsername(string username)
-    {
-        return username.Contains('a') ? 1 : 2;
-    }
+    => Math.Abs(username.GetHashCode());
 }

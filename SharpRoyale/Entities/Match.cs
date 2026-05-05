@@ -2,6 +2,12 @@
 
 public class Match
 {
-    private readonly int _matchId;
-    private readonly (Player p1, Player p2) _players;
+    public int MatchId { get; }
+    public (Player p1, Player p2) Players { get; }
+
+    public Match(int matchId, (Player p1, Player p2) players)
+    {
+        MatchId = matchId;
+        Players = players;
+    }
 }

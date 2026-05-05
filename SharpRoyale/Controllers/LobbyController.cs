@@ -25,12 +25,7 @@ public class LobbyController(LobbyService lobbyService, MatchNotifier matchNotif
 
         try
         {
-            while (!HttpContext.RequestAborted.IsCancellationRequested)
-            {
-                await Response.WriteAsync("ping\n\n");
-                await Response.Body.FlushAsync();
-                await Task.Delay(TimeSpan.FromSeconds(10), HttpContext.RequestAborted);
-            }
+            await matchNotifier.WaitForMatchAsync(playerId, HttpContext.RequestAborted);
         }
         catch (OperationCanceledException)
         {
