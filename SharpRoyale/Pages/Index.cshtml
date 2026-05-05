@@ -1,0 +1,166 @@
+@page
+@model SharpRoyale.Pages.IndexModel
+@{
+    ViewData["Title"] = "SharpRoyale";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <div class="brand">
+                <span class="brand-dot"></span>
+                <div>
+                    <div class="brand-title">SharpRoyale</div>
+                    <div class="brand-subtitle">Minimal API Console</div>
+                </div>
+            </div>
+            <div class="user-field">
+                <label for="username">Username</label>
+                <input id="username" name="username" type="text" placeholder="player_one" autocomplete="username" />
+                <span class="hint">Used by Register and Stream Join</span>
+            </div>
+        </header>
+
+        <main class="grid">
+            <section class="card">
+                <div class="card-header">
+                    <h2>Register</h2>
+                    <span class="pill">POST /api/auth/register</span>
+                </div>
+                <p class="card-text">Creates an auth cookie for the current username.</p>
+                <div class="field">
+                    <label for="register-password">Password</label>
+                    <input id="register-password" name="register-password" type="password" placeholder="min 6 chars" autocomplete="new-password" />
+                </div>
+                <div class="actions">
+                    <button id="register-btn" class="primary" type="button">Send</button>
+                </div>
+                <pre id="register-result" class="output">Idle.</pre>
+            </section>
+
+            <section class="card">
+                <div class="card-header">
+                    <h2>Stream Join</h2>
+                    <span class="pill">GET /api/lobby/stream/join</span>
+                </div>
+                <p class="card-text">Opens a Server-Sent Events stream. Register first to set the cookie.</p>
+                <div class="actions">
+                    <button id="stream-btn" class="primary" type="button">Connect</button>
+                    <button id="stream-stop-btn" class="ghost" type="button">Stop</button>
+                    <span id="stream-status" class="status">Idle</span>
+                </div>
+                <pre id="stream-log" class="output">No events yet.</pre>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const usernameInput = document.getElementById("username");
+        const registerPassword = document.getElementById("register-password");
+        const registerBtn = document.getElementById("register-btn");
+        const registerResult = document.getElementById("register-result");
+
+        const streamBtn = document.getElementById("stream-btn");
+        const streamStopBtn = document.getElementById("stream-stop-btn");
+        const streamStatus = document.getElementById("stream-status");
+        const streamLog = document.getElementById("stream-log");
+
+        let eventSource = null;
+
+        const getUsername = () => usernameInput.value.trim();
+
+        const setRegisterResult = (text, isError) => {
+            registerResult.textContent = text;
+            registerResult.classList.toggle("error", Boolean(isError));
+        };
+
+        const appendStreamLog = (text) => {
+            streamLog.textContent += `\n${text}`;
+            streamLog.scrollTop = streamLog.scrollHeight;
+        };
+
+        registerBtn.addEventListener("click", async () => {
+            const username = getUsername();
+            const password = registerPassword.value;
+
+            if (!username) {
+                setRegisterResult("Username is required.", true);
+                return;
+            }
+            if (!password) {
+                setRegisterResult("Password is required.", true);
+                return;
+            }
+
+            registerBtn.disabled = true;
+            setRegisterResult("Sending...", false);
+
+            try {
+                const response = await fetch("/api/auth/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ username, password })
+                });
+
+                if (response.ok) {
+                    setRegisterResult("Registered. Auth cookie set.", false);
+                } else {
+                    const body = await response.text();
+                    const message = body ? body : response.statusText;
+                    setRegisterResult(`Error ${response.status}: ${message}`, true);
+                }
+            } catch (error) {
+                setRegisterResult(`Network error: ${error}`, true);
+            } finally {
+                registerBtn.disabled = false;
+            }
+        });
+
+        streamBtn.addEventListener("click", () => {
+            if (eventSource) {
+                eventSource.close();
+            }
+
+            streamLog.textContent = "Connecting...";
+            streamStatus.textContent = "Connecting";
+
+            eventSource = new EventSource("/api/lobby/stream/join");
+
+            eventSource.onopen = () => {
+                streamStatus.textContent = "Connected";
+                appendStreamLog("Connected.");
+            };
+
+            eventSource.onmessage = (event) => {
+                appendStreamLog(event.data || "(message)");
+            };
+
+            eventSource.onerror = () => {
+                streamStatus.textContent = "Disconnected";
+                appendStreamLog("Disconnected.");
+                eventSource.close();
+                eventSource = null;
+            };
+        });
+
+        streamStopBtn.addEventListener("click", () => {
+            if (!eventSource) {
+                streamStatus.textContent = "Idle";
+                return;
+            }
+
+            eventSource.close();
+            eventSource = null;
+            streamStatus.textContent = "Stopped";
+            appendStreamLog("Stopped by user.");
+        });
+    </script>
+</body>
+</html>

@@ -16,6 +16,7 @@ builder.Services.AddHostedService<MatchmakingWorker>();
 builder.Services.AddSingleton<MatchService>();
 
 builder.Services.AddControllers();
+builder.Services.AddRazorPages();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -42,11 +43,13 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.MapScalarApiReference(); 
+    app.MapScalarApiReference();
 }
 
-app.UseAuthentication(); 
-app.UseAuthorization(); 
+app.UseStaticFiles();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+app.MapRazorPages();
 
 app.Run();
