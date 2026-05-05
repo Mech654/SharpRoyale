@@ -18,7 +18,7 @@ public class AuthController(TokenService tokenService) : ControllerBase
             HttpOnly = true,
             Secure = false, 
             SameSite = SameSiteMode.Lax, 
-            Expires = DateTimeOffset.UtcNow.AddHours(1)
+            Expires = DateTimeOffset.UtcNow.AddHours(24)
         });
         return Ok();
     }
@@ -33,7 +33,7 @@ public class AuthController(TokenService tokenService) : ControllerBase
             HttpOnly = true,
             Secure = false, 
             SameSite = SameSiteMode.Lax, 
-            Expires = DateTimeOffset.UtcNow.AddHours(1)
+            Expires = DateTimeOffset.UtcNow.AddHours(24)
         });
         return Ok();
     }

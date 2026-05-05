@@ -13,6 +13,7 @@ builder.Services.AddScoped<TokenService>();
 builder.Services.AddSingleton<LobbyService>();
 builder.Services.AddSingleton<MatchNotifier>();
 builder.Services.AddHostedService<MatchmakingWorker>();
+builder.Services.AddSingleton<MatchService>();
 
 builder.Services.AddControllers();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

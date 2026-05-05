@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace SharpRoyale.Controllers;
 
@@ -12,15 +13,21 @@ public class LobbyController(LobbyService lobbyService, MatchNotifier matchNotif
     {
         Response.Headers.Append("Content-Type", "text/event-stream");
 
-        var playerId = "123"; // Change To JWT Extraction Later
+        var idValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrWhiteSpace(idValue) || !int.TryParse(idValue, out var playerId))
+        {
+            Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return;
+        }
+
         matchNotifier.Register(playerId, Response);
         lobbyService.JoinQueue(playerId);
-        
+
         try
         {
             while (!HttpContext.RequestAborted.IsCancellationRequested)
             {
-                await Response.WriteAsync(":\n\n");
+                await Response.WriteAsync("ping\n\n");
                 await Response.Body.FlushAsync();
                 await Task.Delay(TimeSpan.FromSeconds(10), HttpContext.RequestAborted);
             }
