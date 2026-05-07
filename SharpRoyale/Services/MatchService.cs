@@ -8,22 +8,21 @@ public class MatchService
     private ConcurrentDictionary<int, Match> _matches = new();
     private int _counter;
 
-    public bool CreateMatch(Player p1, Player p2)
-    {
-        throw new NotImplementedException();
-    }
-
-    // Not A Valid Overload Situation, But I Didn't Decide Which One To Use Yet
     public int CreateMatch((Player p1, Player p2) match)
     {
         var nextMatchId = Interlocked.Increment(ref _counter);
         
-        //TODO: Store this shi somewhere 
-        new Match(
+        var newMatch = new Match(
             matchId: nextMatchId,
             players: match
         );
+        _matches.TryAdd(nextMatchId, newMatch);
 
         return nextMatchId;
+    }
+    
+    public bool CheckMatchExists(int matchId)
+    {
+        return _matches.ContainsKey(matchId);
     }
 }

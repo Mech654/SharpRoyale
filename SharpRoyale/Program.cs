@@ -4,6 +4,7 @@ using SharpRoyale.Services;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
+using SharpRoyale.Hubs;
 using SharpRoyale.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +16,7 @@ builder.Services.AddSingleton<MatchNotifier>();
 builder.Services.AddHostedService<MatchmakingWorker>();
 builder.Services.AddSingleton<MatchService>();
 
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,5 +53,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapRazorPages();
+app.MapHub<MatchHub>("/hubs/match");
 
 app.Run();
