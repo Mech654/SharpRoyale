@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using SharpRoyale.Entities;
+using Web.SharpRoyale.Entities;
 
-namespace SharpRoyale.Services;
+namespace Web.SharpRoyale.Services;
 
 public class MatchService
 {
@@ -11,7 +11,7 @@ public class MatchService
     public int CreateMatch((Player p1, Player p2) match)
     {
         var nextMatchId = Interlocked.Increment(ref _counter);
-        
+
         var newMatch = new Match(
             matchId: nextMatchId,
             players: match
@@ -20,7 +20,7 @@ public class MatchService
 
         return nextMatchId;
     }
-    
+
     public bool CheckMatchExists(int matchId)
     {
         return _matches.ContainsKey(matchId);

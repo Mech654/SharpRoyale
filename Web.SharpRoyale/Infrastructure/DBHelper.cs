@@ -1,5 +1,5 @@
 ﻿
-namespace SharpRoyale.Infrastructure;
+namespace Web.SharpRoyale.Infrastructure;
 
 // Mostly mock stuff until Db gets implemented
 public static class DbHelper

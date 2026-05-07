@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace SharpRoyale.Controllers;
+namespace Web.SharpRoyale.Controllers;
 
 [Authorize]
 [Route("api/lobby")]

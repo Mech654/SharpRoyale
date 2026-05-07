@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models = SharpRoyale.Models;
+using Models = Web.SharpRoyale.Models;
 
-namespace SharpRoyale.Controllers;
+namespace Web.SharpRoyale.Controllers;
 
 [ApiController]
 [Route("api/auth")]
@@ -16,13 +16,13 @@ public class AuthController(TokenService tokenService) : ControllerBase
         Response.Cookies.Append("access_token", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false, 
-            SameSite = SameSiteMode.Lax, 
+            Secure = false,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddHours(24)
         });
         return Ok();
     }
-    
+
     [HttpPost("register")]
     public IActionResult Register([FromBody] Models.RegisterDTO request)
     {
@@ -31,8 +31,8 @@ public class AuthController(TokenService tokenService) : ControllerBase
         Response.Cookies.Append("access_token", token, new CookieOptions
         {
             HttpOnly = true,
-            Secure = false, 
-            SameSite = SameSiteMode.Lax, 
+            Secure = false,
+            SameSite = SameSiteMode.Lax,
             Expires = DateTimeOffset.UtcNow.AddHours(24)
         });
         return Ok();

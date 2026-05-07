@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpRoyale", "SharpRoyale\SharpRoyale.csproj", "{863C894D-8A30-4F26-A8C0-1695B1A8FED5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.SharpRoyale", "Web.SharpRoyale\Web.SharpRoyale.csproj", "{863C894D-8A30-4F26-A8C0-1695B1A8FED5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

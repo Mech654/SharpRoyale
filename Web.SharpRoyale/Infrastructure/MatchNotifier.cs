@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json;
 
-namespace SharpRoyale.Infrastructure;
+namespace Web.SharpRoyale.Infrastructure;
 
 public class MatchNotifier
 {
@@ -22,13 +22,13 @@ public class MatchNotifier
         if (_clients.TryGetValue(p1.PlayerId, out var r1))
         {
             var payload = new { type = "matchFound", matchId = matchId };
-            await WriteSse(r1, JsonSerializer.Serialize(payload)); 
+            await WriteSse(r1, JsonSerializer.Serialize(payload));
         }
 
         if (_clients.TryGetValue(p2.PlayerId, out var r2))
         {
             var payload = new { type = "matchFound", matchId = matchId };
-            await WriteSse(r2, JsonSerializer.Serialize(payload)); 
+            await WriteSse(r2, JsonSerializer.Serialize(payload));
         }
     }
 
@@ -37,7 +37,7 @@ public class MatchNotifier
         await res.WriteAsync($"data: {msg}\n\n");
         await res.Body.FlushAsync();
     }
-    
+
     public Task WaitForMatchAsync(int playerId, CancellationToken ct)
     {
         var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -57,7 +57,7 @@ public class MatchNotifier
         {
             tcs1.TrySetResult(true);
         }
-        
+
         if (_waiters.TryRemove(p2.PlayerId, out var tcs2))
         {
             tcs2.TrySetResult(true);

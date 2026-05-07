@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace SharpRoyale.Hubs;
+namespace Web.SharpRoyale.Hubs;
 
 [Authorize]
 public class MatchHub(MatchService matchService) : Hub
@@ -24,7 +24,7 @@ public class MatchHub(MatchService matchService) : Hub
         }
 
     }
-    
+
     private static int GetPlayerId(ClaimsPrincipal? user)
     {
         var idValue = user?.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -35,5 +35,5 @@ public class MatchHub(MatchService matchService) : Hub
 
         return playerId;
     }
-    
+
 }

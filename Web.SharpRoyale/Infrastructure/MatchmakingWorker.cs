@@ -1,4 +1,4 @@
-﻿namespace SharpRoyale.Infrastructure;
+﻿namespace Web.SharpRoyale.Infrastructure;
 
 public class MatchmakingWorker(LobbyService lobbyService, MatchNotifier notifier, MatchService matchService) : BackgroundService
 {

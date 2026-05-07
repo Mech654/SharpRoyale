@@ -1,11 +1,11 @@
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using SharpRoyale.Services;
+using Web.SharpRoyale.Services;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
-using SharpRoyale.Hubs;
-using SharpRoyale.Infrastructure;
+using Web.SharpRoyale.Hubs;
+using Web.SharpRoyale.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 

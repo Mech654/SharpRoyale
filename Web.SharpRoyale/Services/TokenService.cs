@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace SharpRoyale.Services;
+namespace Web.SharpRoyale.Services;
 
 public class TokenService(IConfiguration config)
 {
