@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Web.SharpRoyale.Entities;
 using Web.SharpRoyale.Infrastructure;
 
 namespace Web.SharpRoyale.Services;
@@ -12,7 +11,6 @@ public class LobbyService
     public void JoinQueue(int playerId)
     {
         _queue.Enqueue(playerId);
-
     }
 
     public void RemoveFromQueue(int playerId)

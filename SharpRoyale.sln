@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.SharpRoyale", "Web.SharpRoyale\Web.SharpRoyale.csproj", "{863C894D-8A30-4F26-A8C0-1695B1A8FED5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.SharpRoyale", "Core.SharpRoyale\Core.SharpRoyale.csproj", "{F145B940-0661-436C-81F2-2298B1780A8D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{863C894D-8A30-4F26-A8C0-1695B1A8FED5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{863C894D-8A30-4F26-A8C0-1695B1A8FED5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{863C894D-8A30-4F26-A8C0-1695B1A8FED5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F145B940-0661-436C-81F2-2298B1780A8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F145B940-0661-436C-81F2-2298B1780A8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F145B940-0661-436C-81F2-2298B1780A8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F145B940-0661-436C-81F2-2298B1780A8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

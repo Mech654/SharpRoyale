@@ -1,4 +1,4 @@
-﻿namespace Web.SharpRoyale.Entities;
+﻿namespace Core.SharpRoyale;
 
 public class Player(int playerId)
 {

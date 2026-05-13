@@ -16,4 +16,12 @@
         <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.17.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Entities\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Core.SharpRoyale\Core.SharpRoyale.csproj" />
+    </ItemGroup>
+
 </Project>
