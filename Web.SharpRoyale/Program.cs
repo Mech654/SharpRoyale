@@ -1,8 +1,10 @@
+using System.Collections.Concurrent;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
 using Web.SharpRoyale.Hubs;
+using Engine.SharpRoyale;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,14 @@ builder.Services.AddSingleton<MatchNotifier>();
 builder.Services.AddHostedService<MatchmakingWorker>();
 builder.Services.AddSingleton<MatchService>();
 
+// Register the dictionary only (to avoid circular dependency)
+builder.Services.AddSingleton<ConcurrentDictionary<int, Match>>(sp => 
+{
+    var matchService = sp.GetRequiredService<MatchService>();
+    return matchService._matches;
+});
+
+builder.Services.AddSingleton<GameEngine>();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
@@ -51,5 +61,4 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapRazorPages();
 app.MapHub<MatchHub>("/hubs/match");
-
 app.Run();

@@ -22,6 +22,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Core.SharpRoyale\Core.SharpRoyale.csproj" />
+      <ProjectReference Include="..\Engine.SharpRoyale\Engine.SharpRoyale.csproj" />
     </ItemGroup>
 
 </Project>

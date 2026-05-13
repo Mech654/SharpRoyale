@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web.SharpRoyale", "Web.Shar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.SharpRoyale", "Core.SharpRoyale\Core.SharpRoyale.csproj", "{F145B940-0661-436C-81F2-2298B1780A8D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Engine.SharpRoyale", "Engine.SharpRoyale\Engine.SharpRoyale.csproj", "{6AB32D34-B3DE-4E62-9668-A5750462F8BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{F145B940-0661-436C-81F2-2298B1780A8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F145B940-0661-436C-81F2-2298B1780A8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F145B940-0661-436C-81F2-2298B1780A8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AB32D34-B3DE-4E62-9668-A5750462F8BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AB32D34-B3DE-4E62-9668-A5750462F8BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AB32D34-B3DE-4E62-9668-A5750462F8BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AB32D34-B3DE-4E62-9668-A5750462F8BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
