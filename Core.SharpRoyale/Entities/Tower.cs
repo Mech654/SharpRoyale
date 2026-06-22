@@ -1,6 +1,8 @@
-﻿namespace Core.SharpRoyale.Entities;
+﻿using Core.SharpRoyale.GameServices.ActionListService;
 
-public class Tower(int owner) : IEntity
+namespace Core.SharpRoyale.Entities;
+
+public class Tower(int owner, Match match) : IEntity
 {
     public int Owner { get; set; } = owner;
     
@@ -22,8 +24,16 @@ public class Tower(int owner) : IEntity
     {
         throw new NotImplementedException();
     }
-    public void Act()
+    public void Tick()
     {
-        throw new NotImplementedException();
+        // Dummy Section
+        var destination = NavigationService.GetNextNavigation(this, match);
+        ApplyAction(ActionListOption.Move, destination);
+
+    }
+
+    private void ApplyAction(ActionListOption option, object values)
+    {
+        ActionListService.AppendActionList(option, values, this, match );
     }
 }

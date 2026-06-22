@@ -8,7 +8,7 @@ public class ArenaMap
     private const int _height = 32;
 
     private readonly Tile[,] _tiles;
-    private readonly List<IEntity> _entities;
+    public List<IEntity> Entities;
 
     public ArenaMap()
     {
@@ -28,17 +28,17 @@ public class ArenaMap
         _tiles[12, 15].Kind = TileKind.Bridge;
     }
 
-    public ArenaMap AddPlayerTowers((Player p1, Player p2) players)
+    public ArenaMap AddPlayerTowers((Player p1, Player p2) players, Match match)
     {
         // Player 1 towers (bottom)
-        _entities.Add(new Tower(players.p1.PlayerId).ProcessDeployment(9, 28));  // King Tower
-        _entities.Add(new Tower(players.p1.PlayerId).ProcessDeployment(4, 28));  // Left Princess
-        _entities.Add(new Tower(players.p1.PlayerId).ProcessDeployment(14, 28)); // Right Princess
+        Entities.Add(new Tower(players.p1.PlayerId, match).ProcessDeployment(9, 28));  // King Tower
+        Entities.Add(new Tower(players.p1.PlayerId, match).ProcessDeployment(4, 28));  // Left Princess
+        Entities.Add(new Tower(players.p1.PlayerId, match).ProcessDeployment(14, 28)); // Right Princess
 
         // Player 2 towers (top)
-        _entities.Add(new Tower(players.p2.PlayerId).ProcessDeployment(9, 4));   // King Tower
-        _entities.Add(new Tower(players.p2.PlayerId).ProcessDeployment(4, 4));   // Left Princess
-        _entities.Add(new Tower(players.p2.PlayerId).ProcessDeployment(14, 4));  // Right Princess
+        Entities.Add(new Tower(players.p2.PlayerId, match).ProcessDeployment(9, 4));   // King Tower
+        Entities.Add(new Tower(players.p2.PlayerId, match).ProcessDeployment(4, 4));   // Left Princess
+        Entities.Add(new Tower(players.p2.PlayerId, match).ProcessDeployment(14, 4));  // Right Princess
 
         return this;
     }

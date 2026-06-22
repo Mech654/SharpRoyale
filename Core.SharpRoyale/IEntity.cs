@@ -10,5 +10,5 @@ public interface IEntity
     IEntity ProcessDeployment(ushort x, ushort y);
     void ProcessDamage();
     void ProcessDebuff();
-    void Act();
+    void Tick();
 }
