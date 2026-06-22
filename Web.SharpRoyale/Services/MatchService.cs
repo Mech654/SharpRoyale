@@ -1,8 +1,10 @@
 ﻿using System.Collections.Concurrent;
+using Engine.SharpRoyale;
+using Core.SharpRoyale.GameServices.ActionListService;
 
 namespace Web.SharpRoyale.Services;
 
-public class MatchService
+public class MatchService (GameEngine engine)
 {
     public ConcurrentDictionary<int, Match> _matches = new();
     private int _counter;
@@ -16,6 +18,8 @@ public class MatchService
             players: match
         );
         _matches.TryAdd(nextMatchId, newMatch);
+        
+        _ = engine.RunGameLoop(newMatch);
 
         return nextMatchId;
     }
@@ -23,5 +27,11 @@ public class MatchService
     public bool CheckMatchExists(int matchId)
     {
         return _matches.ContainsKey(matchId);
+    }
+
+    public bool SendPlayerActionToEngine(int matchId, int playerId, UserInteractionOption action, object values)
+    {
+        engine.AppendUserInteractionList(new GameEngine.UserInteractionElement(matchId, playerId, action, values));
+        return false;
     }
 }
