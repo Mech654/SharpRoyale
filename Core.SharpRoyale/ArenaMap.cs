@@ -8,7 +8,7 @@ public class ArenaMap
     private const int _height = 32;
 
     private readonly Tile[,] _tiles;
-    public List<IEntity> Entities;
+    public List<Entity> Entities;
 
     public ArenaMap()
     {

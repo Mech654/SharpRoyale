@@ -26,7 +26,7 @@ public class GameEngine(ConcurrentDictionary<int, Match> Matches)
             var sw = Stopwatch.StartNew();
 
             // Collect Action
-            foreach (IEntity entity in m.Map.Entities)
+            foreach (Entity entity in m.Map.Entities)
             {
                 entity.Tick();
             }

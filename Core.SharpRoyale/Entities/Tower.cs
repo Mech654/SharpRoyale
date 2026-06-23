@@ -2,29 +2,29 @@
 
 namespace Core.SharpRoyale.Entities;
 
-public class Tower(int owner, Match match) : IEntity
+public class Tower(int owner, Match match) : Entity
 {
     public int Owner { get; set; } = owner;
     
     public (ushort x, ushort y) Pos { get; set; }
-    public int Width { get; } = 2;
-    public int Height { get; } = 2;
+    public override int Width { get; } = 2;
+    public override int Height { get; } = 2;
     
 
-    public IEntity ProcessDeployment(ushort x, ushort y)
+    public override Entity ProcessDeployment(ushort x, ushort y)
     {
         Pos = (x, y);
         return this;
     }
-    public void ProcessDamage()
+    public override void ProcessDamage()
     {
         throw new NotImplementedException();
     }
-    public void ProcessDebuff()
+    public override void ProcessDebuff()
     {
         throw new NotImplementedException();
     }
-    public void Tick()
+    public override void Tick()
     {
         // Dummy Section
         var destination = NavigationService.GetNextNavigation(this, match);
