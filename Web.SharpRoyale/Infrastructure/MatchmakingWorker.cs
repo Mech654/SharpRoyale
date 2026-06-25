@@ -11,7 +11,7 @@ public class MatchmakingWorker(LobbyService lobbyService, MatchNotifier notifier
                 var matchId = matchService.CreateMatch((p1, p2));
                 await notifier.NotifyMatch(p1, p2, matchId);
                 notifier.SignalMatchFound(p1, p2);
-                Console.WriteLine($"{p1.PlayerId} and {p2.PlayerId}");
+                Console.WriteLine($"{p1.Id} and {p2.Id}");
             }
 
             await Task.Delay(200, stoppingToken);

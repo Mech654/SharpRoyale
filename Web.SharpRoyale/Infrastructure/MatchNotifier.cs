@@ -19,13 +19,13 @@ public class MatchNotifier
 
     public async Task NotifyMatch(Player p1, Player p2, int matchId)
     {
-        if (_clients.TryGetValue(p1.PlayerId, out var r1))
+        if (_clients.TryGetValue(p1.Id, out var r1))
         {
             var payload = new { type = "matchFound", matchId = matchId };
             await WriteSse(r1, JsonSerializer.Serialize(payload));
         }
 
-        if (_clients.TryGetValue(p2.PlayerId, out var r2))
+        if (_clients.TryGetValue(p2.Id, out var r2))
         {
             var payload = new { type = "matchFound", matchId = matchId };
             await WriteSse(r2, JsonSerializer.Serialize(payload));
@@ -53,12 +53,12 @@ public class MatchNotifier
 
     public void SignalMatchFound(Player p1, Player p2)
     {
-        if (_waiters.TryRemove(p1.PlayerId, out var tcs1))
+        if (_waiters.TryRemove(p1.Id, out var tcs1))
         {
             tcs1.TrySetResult(true);
         }
 
-        if (_waiters.TryRemove(p2.PlayerId, out var tcs2))
+        if (_waiters.TryRemove(p2.Id, out var tcs2))
         {
             tcs2.TrySetResult(true);
         }

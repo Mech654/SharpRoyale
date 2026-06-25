@@ -9,11 +9,11 @@ public static class DbHelper
         // Ssh Imagine DB call here...
         if (playerId == 1)
         {
-            return new Player( playerId: playerId );
+            return new Player( id: playerId );
         }
         else
         {
-            return new Player(playerId: playerId);
+            return new Player(id: playerId);
         }
     }
 
