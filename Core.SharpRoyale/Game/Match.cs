@@ -5,7 +5,7 @@ public class Match
     public int MatchId { get; }
     public (Player p1, Player p2) Players { get; }
     public ArenaMap Map { get; }
-    public List<object> ActionList { get; } = [];
+    public List<GameServices.ActionListService.ActionElement> ActionList { get; } = [];
 
     public Match(int matchId, (Player p1, Player p2) players)
     {

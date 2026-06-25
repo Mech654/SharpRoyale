@@ -1,4 +1,4 @@
-﻿namespace Core.SharpRoyale.GameServices;
+﻿namespace Core.SharpRoyale.GameServices.NavigationService;
 
 public static class NavigationService
 {
@@ -7,5 +7,4 @@ public static class NavigationService
         // Dummy
         return (0, 0);
     }
-    
 }

@@ -1,16 +1,19 @@
 ﻿using Core.SharpRoyale.GameServices.ActionListService;
+using Core.SharpRoyale.GameServices.NavigationService;
 
 namespace Core.SharpRoyale.Entities;
 
 public class Tower(int owner, Match match) : Entity
 {
-    public int Owner { get; set; } = owner;
-    
-    public (ushort x, ushort y) Pos { get; set; }
+    public override int Id { get; } = 1;
     public override int Width { get; } = 2;
     public override int Height { get; } = 2;
+    public override int ElixirCost { get; } = 0;
+    public override bool RestrictedDeployment { get; } = true;
     
-
+    public override int Owner { get; set; } = owner;
+    public override (ushort x, ushort y) Pos { get; set; }
+    
     public override Entity ProcessDeployment(ushort x, ushort y)
     {
         Pos = (x, y);
