@@ -12,18 +12,37 @@ public class MatchHub(MatchService matchService) : Hub
     private Player? _player;
     private int? _matchId;
 
-    public override Task OnConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
         _player = DbHelper.GetPlayerFromId(GetPlayerId(Context.User));
-        return base.OnConnectedAsync();
+
+        var matchId = GetMatchIdFromRoute(Context.GetHttpContext());
+        if (!matchService.CheckMatchExists(matchId))
+            throw new HubException("match_not_found");
+
+        _matchId = matchId;
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
+
+        await base.OnConnectedAsync();
     }
 
-    public async Task JoinMatch(int matchId)
+    public Task JoinMatch(int matchId)
     {
         if (matchService.CheckMatchExists(matchId))
         {
             _matchId = matchId;
         }
+
+        return Task.CompletedTask;
+    }
+
+    private static int GetMatchIdFromRoute(HttpContext? httpContext)
+    {
+        var routeValue = httpContext?.Request.RouteValues["matchId"]?.ToString();
+        if (!int.TryParse(routeValue, out var matchId))
+            throw new HubException("invalid_match_id");
+
+        return matchId;
     }
 
     private static int GetPlayerId(ClaimsPrincipal? user)

@@ -60,5 +60,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 app.MapRazorPages();
-app.MapHub<MatchHub>("/hubs/match");
+app.MapHub<MatchHub>("/hubs/match/{matchId:int}");
 app.Run();
