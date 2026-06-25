@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Core.SharpRoyale.GameServices.ActionListService;
+using Core.SharpRoyale.GameServices.UserInteractionService;
 using Engine.SharpRoyale;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -45,12 +45,12 @@ public class MatchHub(MatchService matchService) : Hub
     public Result SendPlayerAction(string action, object values)
     {
         UserInteractionOption? userInteractionOption = MatchUserInteractionOption(action);
-        
+
         if (userInteractionOption == null) return Result.Fail("Invalid Action Option");
         if (_player == null) return Result.Fail("Player not assigned");
         if (_matchId == null) return Result.Fail("Match not assigned");
-        
-        matchService.SendPlayerActionToEngine(_matchId.Value, _player.PlayerId, userInteractionOption.Value, values);
+
+        matchService.SendPlayerActionToEngine(_matchId.Value, _player, userInteractionOption.Value, values);
 
         return Result.Ok();
     }

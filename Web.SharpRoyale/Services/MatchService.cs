@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Engine.SharpRoyale;
 using Core.SharpRoyale.GameServices.ActionListService;
+using Core.SharpRoyale.GameServices.UserInteractionService;
 
 namespace Web.SharpRoyale.Services;
 
@@ -29,9 +30,15 @@ public class MatchService (GameEngine engine)
         return _matches.ContainsKey(matchId);
     }
 
-    public bool SendPlayerActionToEngine(int matchId, int playerId, UserInteractionOption action, object values)
+    public Match GetMatchFromId(int matchId)
     {
-        engine.AppendUserInteractionList(new GameEngine.UserInteractionElement(matchId, playerId, action, values));
-        return false;
+        return _matches[matchId];
+    }
+
+    public bool SendPlayerActionToEngine(int matchId, Player player, UserInteractionOption action, object values)
+    {
+        engine.AppendUserInteractionList(new UserInteractionElement(GetMatchFromId(matchId), player, action, values));
+        // TODO: Needs to be a Result instead
+        return true;
     }
 }

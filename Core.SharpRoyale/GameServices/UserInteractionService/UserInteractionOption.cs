@@ -1,4 +1,4 @@
-﻿namespace Engine.SharpRoyale;
+﻿namespace Core.SharpRoyale.GameServices.UserInteractionService;
 
 public enum UserInteractionOption
 {
