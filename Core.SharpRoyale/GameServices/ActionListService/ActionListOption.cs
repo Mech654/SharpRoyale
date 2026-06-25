@@ -4,7 +4,6 @@ public enum ActionListOption
 {
     Spawn,
     Move,
-    Follow,
     Attack,
     Die,
     Exit

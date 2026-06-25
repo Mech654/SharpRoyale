@@ -30,16 +30,22 @@ public class ArenaMap
 
     public ArenaMap AddPlayerTowers((Player p1, Player p2) players, Match match)
     {
-        // Player 1 towers (bottom)
-        Entities.Add(new Tower(players.p1.PlayerId, match).ProcessDeployment(9, 28));  // King Tower
-        Entities.Add(new Tower(players.p1.PlayerId, match).ProcessDeployment(4, 28));  // Left Princess
-        Entities.Add(new Tower(players.p1.PlayerId, match).ProcessDeployment(14, 28)); // Right Princess
+        // Player 1 towers (bottomjj)
+        Entities.Add(new Tower(players.p1.Id, match).ProcessDeployment(9, 28));  // King Tower
+        Entities.Add(new Tower(players.p1.Id, match).ProcessDeployment(4, 28));  // Left Princess
+        Entities.Add(new Tower(players.p1.Id, match).ProcessDeployment(14, 28)); // Right Princess
 
         // Player 2 towers (top)
-        Entities.Add(new Tower(players.p2.PlayerId, match).ProcessDeployment(9, 4));   // King Tower
-        Entities.Add(new Tower(players.p2.PlayerId, match).ProcessDeployment(4, 4));   // Left Princess
-        Entities.Add(new Tower(players.p2.PlayerId, match).ProcessDeployment(14, 4));  // Right Princess
+        Entities.Add(new Tower(players.p2.Id, match).ProcessDeployment(9, 4));   // King Tower
+        Entities.Add(new Tower(players.p2.Id, match).ProcessDeployment(4, 4));   // Left Princess
+        Entities.Add(new Tower(players.p2.Id, match).ProcessDeployment(14, 4));  // Right Princess
 
         return this;
+    }
+
+    public bool CheckIfEntityCanBeDeployed(Entity entity)
+    {
+        //TODO: Another Days Work
+        return true;
     }
 }
