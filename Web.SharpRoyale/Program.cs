@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Scalar.AspNetCore;
 using Web.SharpRoyale.Hubs;
 using Engine.SharpRoyale;
+using Web.SharpRoyale.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +13,13 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddSingleton<LobbyService>();
 builder.Services.AddSingleton<MatchNotifier>();
+builder.Services.AddSingleton<ITickResultPublisher, SignalRTickResultPublisher>();
+builder.Services.AddSingleton<TickClientFeedback>();
 builder.Services.AddHostedService<MatchmakingWorker>();
 builder.Services.AddSingleton<MatchService>();
 
 // Register the dictionary only (to avoid circular dependency)
-builder.Services.AddSingleton<ConcurrentDictionary<int, Match>>(sp => 
+builder.Services.AddSingleton<ConcurrentDictionary<int, Match>>(sp =>
 {
     var matchService = sp.GetRequiredService<MatchService>();
     return matchService._matches;

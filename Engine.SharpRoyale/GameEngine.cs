@@ -1,18 +1,22 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using Core.SharpRoyale;
+using Core.SharpRoyale.GameServices.ActionListService;
+using Core.SharpRoyale.GameServices.DeckService;
+using Core.SharpRoyale.GameServices.SpawnService;
+using Core.SharpRoyale.GameServices.UserInteractionService;
 
 namespace Engine.SharpRoyale;
 
 public class GameEngine(ConcurrentDictionary<int, Match> matches, TickClientFeedback tickClientFeedback)
 {
-    public record UserInteractionElement(int matchId, int playerId, UserInteractionOption action, object values);
+    private readonly ConcurrentDictionary<int, Match> _matches = matches;
+    private readonly TickClientFeedback _tickClientFeedback = tickClientFeedback;
 
-    public List<UserInteractionElement> UserInteractionList = [];
+    public readonly List<UserInteractionElement> UserInteractionList = [];
 
     public void AppendUserInteractionList(UserInteractionElement userInteraction)
     {
-        //TODO: Validation Logic For The UserAction, Examples: Spawn Location(Tile), Elixir Capacity, Card Available In Deck
         var time = DateTime.Now;
         UserInteractionList.Add(userInteraction);
     }
@@ -25,9 +29,9 @@ public class GameEngine(ConcurrentDictionary<int, Match> matches, TickClientFeed
     }
     public async Task RunGameLoop(Match m)
     {
-        const int tickRate = 60; 
+        const int tickRate = 60;
         const int msPerTick = 1000 / tickRate;
-        
+        long tickId = 0;
 
         DeployPlayerDecks(m.Players.p1, m.Players.p2, m);
 
@@ -46,9 +50,18 @@ public class GameEngine(ConcurrentDictionary<int, Match> matches, TickClientFeed
             {
                 entity.Tick();
             }
-            
+
+            var resolvedActionList = ActionListService.GetResolvedActionList(m);
+
             // Apply Action
-            
+            ActionListService.ApplyActionList(m);
+
+            // Feedback to clients
+            var tickResult = _tickClientFeedback.BuildTickResult(m.MatchId, tickId, resolvedActionList);
+            await _tickClientFeedback.PublishTickResultAsync(tickResult);
+            tickId++;
+
+
             // Sleep
             var elapsed = sw.ElapsedMilliseconds;
             if (elapsed < msPerTick)
