@@ -10,6 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.7/signalr.min.js"></script>
 </head>
 <body>
     <div class="page">
@@ -28,35 +29,73 @@
             </div>
         </header>
 
-        <main class="grid">
-            <section class="card">
-                <div class="card-header">
-                    <h2>Register</h2>
-                    <span class="pill">POST /api/auth/register</span>
-                </div>
-                <p class="card-text">Creates an auth cookie for the current username.</p>
-                <div class="field">
-                    <label for="register-password">Password</label>
-                    <input id="register-password" name="register-password" type="password" placeholder="min 6 chars" autocomplete="new-password" />
-                </div>
-                <div class="actions">
-                    <button id="register-btn" class="primary" type="button">Send</button>
-                </div>
-                <pre id="register-result" class="output">Idle.</pre>
-            </section>
+        <main>
+            <div class="grid">
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Register</h2>
+                        <span class="pill">POST /api/auth/register</span>
+                    </div>
+                    <p class="card-text">Creates an auth cookie for the current username.</p>
+                    <div class="field">
+                        <label for="register-password">Password</label>
+                        <input id="register-password" name="register-password" type="password" placeholder="min 6 chars" autocomplete="new-password" />
+                    </div>
+                    <div class="actions">
+                        <button id="register-btn" class="primary" type="button">Send</button>
+                    </div>
+                    <pre id="register-result" class="output">Idle.</pre>
+                </section>
 
-            <section class="card">
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Stream Join</h2>
+                        <span class="pill">GET /api/lobby/stream/join</span>
+                    </div>
+                    <p class="card-text">Opens a Server-Sent Events stream. Register first to set the cookie.</p>
+                    <div class="actions">
+                        <button id="stream-btn" class="primary" type="button">Connect</button>
+                        <button id="stream-stop-btn" class="ghost" type="button">Stop</button>
+                        <span id="stream-status" class="status">Idle</span>
+                    </div>
+                    <pre id="stream-log" class="output">No events yet.</pre>
+                </section>
+            </div>
+
+            <section class="card wide-card">
                 <div class="card-header">
-                    <h2>Stream Join</h2>
-                    <span class="pill">GET /api/lobby/stream/join</span>
+                    <h2>Join Match</h2>
+                    <span class="pill">WS /hubs/match/{matchId}</span>
                 </div>
-                <p class="card-text">Opens a Server-Sent Events stream. Register first to set the cookie.</p>
-                <div class="actions">
-                    <button id="stream-btn" class="primary" type="button">Connect</button>
-                    <button id="stream-stop-btn" class="ghost" type="button">Stop</button>
-                    <span id="stream-status" class="status">Idle</span>
+                <p class="card-text">Connect to the game session using SignalR to receive live tick events. Auto-filled on Match Found.</p>
+                
+                <div class="ws-controls-row">
+                    <div class="field-inline">
+                        <label for="match-id">Match ID</label>
+                        <input id="match-id" name="match-id" type="number" placeholder="Enter match ID..." />
+                    </div>
+                    <div class="actions-inline">
+                        <button id="ws-connect-btn" class="primary" type="button">Connect WS</button>
+                        <button id="ws-stop-btn" class="ghost" type="button" disabled>Stop</button>
+                        <span id="ws-status" class="status">Idle</span>
+                    </div>
                 </div>
-                <pre id="stream-log" class="output">No events yet.</pre>
+
+                <div class="split-container-bottom">
+                    <div class="split-game">
+                        <label>Game Screen</label>
+                        <div class="game-viewport">
+                            <div class="arena">
+                                <div class="status-overlay" id="game-status-overlay">Awaiting Game Data...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="split-feed">
+                        <label>WebSocket Feed (Tick Result Logs)</label>
+                        <pre id="ws-log" class="output log-feed">No data received yet.</pre>
+                    </div>
+                </div>
             </section>
         </main>
     </div>
@@ -72,7 +111,14 @@
         const streamStatus = document.getElementById("stream-status");
         const streamLog = document.getElementById("stream-log");
 
+        const matchIdInput = document.getElementById("match-id");
+        const wsConnectBtn = document.getElementById("ws-connect-btn");
+        const wsStopBtn = document.getElementById("ws-stop-btn");
+        const wsStatus = document.getElementById("ws-status");
+        const wsLog = document.getElementById("ws-log");
+
         let eventSource = null;
+        let hubConnection = null;
 
         const getUsername = () => usernameInput.value.trim().slice(0, 7);
 
@@ -114,6 +160,15 @@
         const appendStreamLog = (text) => {
             streamLog.textContent += `\n${text}`;
             streamLog.scrollTop = streamLog.scrollHeight;
+        };
+
+        const appendWsLog = (text) => {
+            if (wsLog.textContent === "No data received yet." || wsLog.textContent === "Connecting...") {
+                wsLog.textContent = text;
+            } else {
+                wsLog.textContent += `\n${text}`;
+            }
+            wsLog.scrollTop = wsLog.scrollHeight;
         };
 
         const sendRegister = async () => {
@@ -172,6 +227,21 @@
 
             eventSource.onmessage = (event) => {
                 appendStreamLog(event.data || "(message)");
+
+                try {
+                    const payload = JSON.parse(event.data);
+                    if (payload && payload.type === "matchFound" && payload.matchId) {
+                        matchIdInput.value = payload.matchId;
+                        appendStreamLog(`Match Found! Automatically captured Match ID: ${payload.matchId}`);
+                        
+                        matchIdInput.classList.add("pulse-highlight");
+                        setTimeout(() => {
+                            matchIdInput.classList.remove("pulse-highlight");
+                        }, 2000);
+                    }
+                } catch (e) {
+                    // Not a matchFound event or invalid JSON, ignore
+                }
             };
 
             eventSource.onerror = () => {
@@ -193,6 +263,87 @@
             streamStatus.textContent = "Stopped";
             appendStreamLog("Stopped by user.");
         });
+
+        const connectSignalR = async () => {
+            const matchIdStr = matchIdInput.value.trim();
+            if (!matchIdStr) {
+                alert("Please enter or capture a Match ID first.");
+                return;
+            }
+
+            const matchId = parseInt(matchIdStr, 10);
+            if (isNaN(matchId)) {
+                alert("Match ID must be a number.");
+                return;
+            }
+
+            if (hubConnection) {
+                await stopSignalR();
+            }
+
+            wsLog.textContent = "Connecting...";
+            wsStatus.textContent = "Connecting";
+            wsConnectBtn.disabled = true;
+            wsStopBtn.disabled = false;
+
+            hubConnection = new signalR.HubConnectionBuilder()
+                .withUrl(`/hubs/match/${matchId}`)
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            hubConnection.on("TickResult", (tickResult) => {
+                const formatted = JSON.stringify(tickResult, null, 2);
+                appendWsLog(`[Tick ${tickResult.tickId || 0}]: ${formatted}`);
+            });
+
+            hubConnection.onclose((error) => {
+                wsStatus.textContent = "Disconnected";
+                wsConnectBtn.disabled = false;
+                wsStopBtn.disabled = true;
+                if (error) {
+                    appendWsLog(`Connection closed with error: ${error}`);
+                } else {
+                    appendWsLog("Connection closed.");
+                }
+                document.getElementById("game-status-overlay").textContent = "Awaiting Game Data...";
+                hubConnection = null;
+            });
+
+            try {
+                await hubConnection.start();
+                wsStatus.textContent = "Connected";
+                wsConnectBtn.disabled = true;
+                wsStopBtn.disabled = false;
+                appendWsLog(`Connected to Match Hub for Match ID: ${matchId}`);
+                document.getElementById("game-status-overlay").textContent = "Arena Active";
+            } catch (err) {
+                wsStatus.textContent = "Error";
+                wsConnectBtn.disabled = false;
+                wsStopBtn.disabled = true;
+                appendWsLog(`Connection failed: ${err.message || err}`);
+                document.getElementById("game-status-overlay").textContent = "Awaiting Game Data...";
+                hubConnection = null;
+            }
+        };
+
+        const stopSignalR = async () => {
+            if (hubConnection) {
+                try {
+                    await hubConnection.stop();
+                } catch (err) {
+                    console.error("Error stopping connection:", err);
+                }
+                hubConnection = null;
+            }
+            wsStatus.textContent = "Stopped";
+            wsConnectBtn.disabled = false;
+            wsStopBtn.disabled = true;
+            appendWsLog("Stopped by user.");
+            document.getElementById("game-status-overlay").textContent = "Awaiting Game Data...";
+        };
+
+        wsConnectBtn.addEventListener("click", connectSignalR);
+        wsStopBtn.addEventListener("click", stopSignalR);
 
         window.addEventListener("load", () => {
             const generated = generateUsername();
