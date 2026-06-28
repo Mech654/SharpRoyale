@@ -8,11 +8,8 @@ using Core.SharpRoyale.GameServices.UserInteractionService;
 
 namespace Engine.SharpRoyale;
 
-public class GameEngine(ConcurrentDictionary<int, Match> matches, TickClientFeedback tickClientFeedback)
+public class GameEngine(TickClientFeedback tickClientFeedback)
 {
-    private readonly ConcurrentDictionary<int, Match> _matches = matches;
-    private readonly TickClientFeedback _tickClientFeedback = tickClientFeedback;
-
     public readonly List<UserInteractionElement> UserInteractionList = [];
 
     public void AppendUserInteractionList(UserInteractionElement userInteraction)
@@ -57,8 +54,8 @@ public class GameEngine(ConcurrentDictionary<int, Match> matches, TickClientFeed
             ActionListService.ApplyActionList(m);
 
             // Feedback to clients
-            var tickResult = _tickClientFeedback.BuildTickResult(m.MatchId, tickId, resolvedActionList);
-            await _tickClientFeedback.PublishTickResultAsync(tickResult);
+            var tickResult = tickClientFeedback.BuildTickResult(m.MatchId, tickId, resolvedActionList);
+            await tickClientFeedback.PublishTickResultAsync(tickResult);
             tickId++;
 
 

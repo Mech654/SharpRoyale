@@ -18,13 +18,6 @@ builder.Services.AddSingleton<TickClientFeedback>();
 builder.Services.AddHostedService<MatchmakingWorker>();
 builder.Services.AddSingleton<MatchService>();
 
-// Register the dictionary only (to avoid circular dependency)
-builder.Services.AddSingleton<ConcurrentDictionary<int, Match>>(sp =>
-{
-    var matchService = sp.GetRequiredService<MatchService>();
-    return matchService._matches;
-});
-
 builder.Services.AddSingleton<GameEngine>();
 builder.Services.AddSignalR();
 builder.Services.AddControllers();
@@ -64,4 +57,5 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapRazorPages();
 app.MapHub<MatchHub>("/hubs/match/{matchId:int}");
+Console.WriteLine("Running now");
 app.Run();
