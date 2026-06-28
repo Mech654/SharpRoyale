@@ -8,7 +8,7 @@ public class ArenaMap
     private const int _height = 32;
 
     private readonly Tile[,] _tiles;
-    public List<Entity> Entities;
+    public List<Entity> Entities { get; } = new();
 
     public ArenaMap()
     {
@@ -17,7 +17,10 @@ public class ArenaMap
         // default
         for (var x = 0; x < _width; x++)
         for (var y = 0; y < _height; y++)
+        {
+            _tiles[x, y] = new Tile();
             _tiles[x, y].Kind = TileKind.Standard;
+        }
 
         // River
         for (var x = 0; x < _width; x++)
