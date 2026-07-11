@@ -9,6 +9,16 @@ using Web.SharpRoyale.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+    {
+        policy
+            .WithOrigins("http://localhost:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 builder.Services.AddOpenApi();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddSingleton<LobbyService>();
@@ -50,7 +60,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
-
+app.UseCors("Frontend");
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
