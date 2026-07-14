@@ -1,0 +1,77 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body {
+  margin: 0;
+  background-color: #0f2b1d;
+}
+header {
+  width: 100%;
+  height: 60px;
+  background-color: #3e2a17;
+  color: #f0e2c0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.game-window {
+  width: 30%;
+  aspect-ratio: 18 / 32;
+  border-radius: 10px;
+  margin-top: 100px;
+  margin-bottom: 100px;
+  background-color: #1f4d3a;
+  display: flex;
+  justify-content: center;
+  box-shadow:
+    0 0 0 4px #6b4423,
+    0 8px 20px rgba(0, 0, 0, 0.4);
+}
+.game-window canvas {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+.game-window p {
+  position: absolute;
+  z-index: 3;
+  color: #f0e2c0;
+}
+.join-match-button {
+  z-index: 1;
+  margin-top: 40%;
+  padding: 10px 20px;
+  height: fit-content;
+  width: fit-content;
+  font-size: 16px;
+  background-color: #c88a2b;
+  color: #fff;
+  border: 2px solid #8a5a1a;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    transform 0.1s ease,
+    background-color 0.1s ease;
+}
+
+.join-match-button:hover {
+  background-color: #d99a3b;
+}
+
+.join-match-button:active {
+  transform: scale(0.96) translateY(1px);
+  background-color: #a8721f;
+}
+
+.join-match-button:disabled {
+  background-color: #6b6b6b;
+  border-color: #4a4a4a;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.join-match-button:disabled:hover {
+  background-color: #6b6b6b;
+}
