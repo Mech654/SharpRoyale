@@ -51,6 +51,7 @@ async function RegisterUser(
     const response = await fetch("http://localhost:5182/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ username, password }),
     });
 
