@@ -24,6 +24,7 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
         DeckService.DeployPlayerDeck(player2, match);
         // TODO: Probably need feedback to user here
     }
+
     public async Task RunGameLoop(Match m)
     {
         const int tickRate = 60;
@@ -32,6 +33,7 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
 
         DeployPlayerDecks(m.Players.p1, m.Players.p2, m);
 
+        await Task.Delay(5000);
         while (true)
         {
             var sw = Stopwatch.StartNew();
@@ -54,10 +56,13 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
             ActionListService.ApplyActionList(m);
 
             // Feedback to clients
-            var tickResult = tickClientFeedback.BuildTickResult(m.MatchId, tickId, resolvedActionList);
+            var tickResult = tickClientFeedback.BuildTickResult(
+                m.MatchId,
+                tickId,
+                resolvedActionList
+            );
             await tickClientFeedback.PublishTickResultAsync(tickResult);
             tickId++;
-
 
             // Sleep
             var elapsed = sw.ElapsedMilliseconds;

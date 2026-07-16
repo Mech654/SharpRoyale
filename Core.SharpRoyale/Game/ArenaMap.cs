@@ -1,4 +1,5 @@
 ﻿using Core.SharpRoyale.Entities;
+using Core.SharpRoyale.GameServices.ActionListService;
 
 namespace Core.SharpRoyale;
 
@@ -8,7 +9,6 @@ public class ArenaMap
     private const int _height = 32;
 
     private readonly Tile[,] _tiles;
-    public List<Entity> Entities { get; } = new();
 
     public ArenaMap()
     {
@@ -31,17 +31,47 @@ public class ArenaMap
         _tiles[12, 15].Kind = TileKind.Bridge;
     }
 
+    public List<Entity> Entities { get; } = new();
+
     public ArenaMap AddPlayerTowers((Player p1, Player p2) players, Match match)
     {
-        // Player 1 towers (bottomjj)
-        Entities.Add(new Tower(players.p1.Id, match).ProcessDeployment(9, 28));  // King Tower
-        Entities.Add(new Tower(players.p1.Id, match).ProcessDeployment(4, 28));  // Left Princess
-        Entities.Add(new Tower(players.p1.Id, match).ProcessDeployment(14, 28)); // Right Princess
+        // Player 1 towers (bottom)
+        ActionListService.AppendActionListSpawn(
+            new ActionListValueSpawn(new Position(9, 28), EntityId.Tower),
+            new Tower(players.p1.Id, match),
+            match
+        );
+
+        ActionListService.AppendActionListSpawn(
+            new ActionListValueSpawn(new Position(4, 28), EntityId.Tower),
+            new Tower(players.p1.Id, match),
+            match
+        ); // Left Princess
+
+        ActionListService.AppendActionListSpawn(
+            new ActionListValueSpawn(new Position(14, 28), EntityId.Tower),
+            new Tower(players.p1.Id, match),
+            match
+        ); // Right Princess
 
         // Player 2 towers (top)
-        Entities.Add(new Tower(players.p2.Id, match).ProcessDeployment(9, 4));   // King Tower
-        Entities.Add(new Tower(players.p2.Id, match).ProcessDeployment(4, 4));   // Left Princess
-        Entities.Add(new Tower(players.p2.Id, match).ProcessDeployment(14, 4));  // Right Princess
+        ActionListService.AppendActionListSpawn(
+            new ActionListValueSpawn(new Position(9, 4), EntityId.Tower),
+            new Tower(players.p2.Id, match),
+            match
+        ); // King Tower
+
+        ActionListService.AppendActionListSpawn(
+            new ActionListValueSpawn(new Position(4, 4), EntityId.Tower),
+            new Tower(players.p2.Id, match),
+            match
+        ); // Left Princess
+
+        ActionListService.AppendActionListSpawn(
+            new ActionListValueSpawn(new Position(14, 4), EntityId.Tower),
+            new Tower(players.p2.Id, match),
+            match
+        ); // Right Princess
 
         return this;
     }

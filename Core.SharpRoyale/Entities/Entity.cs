@@ -1,4 +1,5 @@
 ﻿namespace Core.SharpRoyale;
+
 public abstract class Entity
 {
     public abstract int Id { get; }
@@ -20,4 +21,9 @@ public abstract class Entity
     public abstract void ProcessDebuff();
 
     public abstract void Tick();
+}
+
+public enum EntityId
+{
+    Tower = 1,
 }

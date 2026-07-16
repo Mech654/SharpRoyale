@@ -2,16 +2,28 @@
 
 namespace Core.SharpRoyale.GameServices.ActionListService;
 
-public record ActionElement(Entity Entity, ActionListOption Option, object Values, DateTime Time);
+public record ActionElement(
+    Entity Entity,
+    ActionListOption Option,
+    ActionListValue Values,
+    DateTime Time
+);
 
 public static class ActionListService
 {
-    public static void AppendActionList(ActionListOption option, object values, Entity entity, Match match)
+    public static void AppendActionListSpawn(
+        ActionListValueSpawn values,
+        Entity entity,
+        Match match
+    )
     {
+        ArgumentNullException.ThrowIfNull(values);
         ArgumentNullException.ThrowIfNull(entity);
         ArgumentNullException.ThrowIfNull(match);
 
-        match.ActionList.Add(new ActionElement(entity, option, values, DateTime.UtcNow));
+        match.ActionList.Add(
+            new ActionElement(entity, ActionListOption.Spawn, values, DateTime.UtcNow)
+        );
         SortActionList(match);
     }
 
@@ -50,17 +62,13 @@ public static class ActionListService
     {
         ArgumentNullException.ThrowIfNull(match);
 
-        return match.ActionList
-            .OrderBy(GetActionPhase)
-            .ToList();
+        return match.ActionList.OrderBy(GetActionPhase).ToList();
     }
 
     private static void SortActionList(Match match)
     {
         // attack-style actions are processed before movement-style actions.
-        var ordered = match.ActionList
-            .OrderBy(GetActionPhase)
-            .ToList();
+        var ordered = match.ActionList.OrderBy(GetActionPhase).ToList();
 
         match.ActionList.Clear();
         match.ActionList.AddRange(ordered);
@@ -75,7 +83,7 @@ public static class ActionListService
             ActionListOption.Move => 2,
             ActionListOption.Die => 3,
             ActionListOption.Exit => 4,
-            _ => 2
+            _ => 2,
         };
     }
 

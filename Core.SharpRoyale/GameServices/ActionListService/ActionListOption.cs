@@ -6,5 +6,11 @@ public enum ActionListOption
     Move,
     Attack,
     Die,
-    Exit
+    Exit,
 }
+
+public abstract record ActionListValue();
+
+public readonly record struct Position(int X, int Y);
+
+public record ActionListValueSpawn(Position Position, EntityId EntityId) : ActionListValue;
