@@ -17,6 +17,7 @@ header {
   justify-content: center;
 }
 .game-window {
+  position: relative;
   width: 30%;
   aspect-ratio: 18 / 32;
   border-radius: 10px;

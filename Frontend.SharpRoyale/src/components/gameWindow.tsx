@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { connectToMatch } from "../services/WSconnection";
-import { applyEvent } from "../game/gameState";
 import { renderFrame } from "../game/renderer";
+import { applyMatchEvent } from "../services/gameEvents";
 
 interface GameWindowProps {
   matchId: number | null;
@@ -32,7 +32,7 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
 
   useEffect(() => {
     if (matchId == null) return;
-    const cleanup = connectToMatch(matchId, applyEvent);
+    const cleanup = connectToMatch(matchId, applyMatchEvent);
     return cleanup;
   }, [matchId]);
 
