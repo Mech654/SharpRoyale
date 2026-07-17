@@ -1,8 +1,9 @@
 ﻿namespace Core.SharpRoyale;
 
-public abstract class Entity
+public abstract class Entity(int id)
 {
-    public abstract int Id { get; }
+    public int Id { get; } = id;
+    public abstract int EntityId { get; }
     public abstract int Owner { get; set; }
 
     public Entity? FollowTarget { get; set; }

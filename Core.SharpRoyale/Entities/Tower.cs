@@ -3,9 +3,9 @@ using Core.SharpRoyale.GameServices.NavigationService;
 
 namespace Core.SharpRoyale.Entities;
 
-public class Tower(int owner, Match match) : Entity
+public class Tower(int owner, Match match) : Entity(match.GetNextEntityId())
 {
-    public override int Id { get; } = 1;
+    public override int EntityId { get; } = 1;
     public override int Width { get; } = 2;
     public override int Height { get; } = 2;
     public override int ElixirCost { get; } = 0;
