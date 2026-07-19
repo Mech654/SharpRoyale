@@ -37,17 +37,15 @@ public class ArenaMap
     {
         // Player 1 towers (bottom)
         ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(9, 28), EntityId.Tower),
-            new Tower(players.p1.Id, match),
+            new ActionListValueSpawn(new Position(9, 30), EntityId.Tower), // King, pulled back near bottom edge
+            new King(players.p1.Id, match),
             match
         );
-
         ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(4, 28), EntityId.Tower),
+            new ActionListValueSpawn(new Position(3, 28), EntityId.Tower),
             new Tower(players.p1.Id, match),
             match
         ); // Left Princess
-
         ActionListService.AppendActionListSpawn(
             new ActionListValueSpawn(new Position(14, 28), EntityId.Tower),
             new Tower(players.p1.Id, match),
@@ -56,17 +54,15 @@ public class ArenaMap
 
         // Player 2 towers (top)
         ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(9, 4), EntityId.Tower),
-            new Tower(players.p2.Id, match),
+            new ActionListValueSpawn(new Position(9, 2), EntityId.Tower), // King, pulled back near top edge
+            new King(players.p2.Id, match),
             match
         ); // King Tower
-
         ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(4, 4), EntityId.Tower),
+            new ActionListValueSpawn(new Position(3, 4), EntityId.Tower),
             new Tower(players.p2.Id, match),
             match
         ); // Left Princess
-
         ActionListService.AppendActionListSpawn(
             new ActionListValueSpawn(new Position(14, 4), EntityId.Tower),
             new Tower(players.p2.Id, match),

@@ -1,13 +1,13 @@
-﻿using Core.SharpRoyale.GameServices.ActionListService;
+using Core.SharpRoyale.GameServices.ActionListService;
 using Core.SharpRoyale.GameServices.NavigationService;
 
 namespace Core.SharpRoyale.Entities;
 
-public class Tower(int owner, Match match) : Entity(match.GetNextEntityId())
+public class King(int owner, Match match) : Entity(match.GetNextEntityId())
 {
-    public override int EntityId { get; } = 1;
-    public override int Width { get; } = 3;
-    public override int Height { get; } = 3;
+    public override int EntityId { get; } = 2;
+    public override int Width { get; } = 4;
+    public override int Height { get; } = 4;
     public override int ElixirCost { get; } = 0;
     public override bool RestrictedDeployment { get; } = true;
 

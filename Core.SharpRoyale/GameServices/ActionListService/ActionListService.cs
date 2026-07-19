@@ -21,10 +21,31 @@ public static class ActionListService
         ArgumentNullException.ThrowIfNull(entity);
         ArgumentNullException.ThrowIfNull(match);
 
+        var normalizedPosition = NormalizeCenterForSize(
+            values.Position,
+            entity.Width,
+            entity.Height
+        );
+        var normalizedValues = values with { Position = normalizedPosition };
+
         match.ActionList.Add(
-            new ActionElement(entity, ActionListOption.Spawn, values, DateTime.UtcNow)
+            new ActionElement(entity, ActionListOption.Spawn, normalizedValues, DateTime.UtcNow)
         );
         SortActionList(match);
+    }
+
+    private static Position NormalizeCenterForSize(Position position, int width, int height)
+    {
+        double x = SnapToParity(position.X, width);
+        double y = SnapToParity(position.Y, height);
+        return new Position(x, y);
+    }
+
+    private static double SnapToParity(double coordinate, int sizeDimension)
+    {
+        bool isOdd = sizeDimension % 2 != 0;
+        double whole = Math.Floor(coordinate);
+        return isOdd ? whole + 0.5 : whole;
     }
 
     public static void ApplyActionList(Match match)

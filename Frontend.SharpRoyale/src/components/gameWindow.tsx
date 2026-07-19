@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { connectToMatch } from "../services/WSconnection";
-import { renderFrame } from "../game/renderer";
+import { renderFrame, setupCanvasResolution } from "../game/renderer";
 import { applyMatchEvent } from "../services/gameEvents";
 
 interface GameWindowProps {
@@ -17,8 +17,18 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
+
+    // initial sizing
+    setupCanvasResolution(canvas);
+
+    // keep it in sync with layout changes
+    const observer = new ResizeObserver(() => {
+      setupCanvasResolution(canvas);
+    });
+    observer.observe(canvas);
 
     let frameId: number;
     const loop = () => {

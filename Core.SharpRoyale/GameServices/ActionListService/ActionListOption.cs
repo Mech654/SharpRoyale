@@ -11,6 +11,6 @@ public enum ActionListOption
 
 public abstract record ActionListValue();
 
-public readonly record struct Position(int X, int Y);
+public readonly record struct Position(double X, double Y);
 
 public record ActionListValueSpawn(Position Position, EntityId EntityId) : ActionListValue;

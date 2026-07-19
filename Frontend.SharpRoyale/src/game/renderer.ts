@@ -1,18 +1,19 @@
 import { gameState } from "./gameState";
+import { ENTITY_DATA } from "./EntityData";
 
 const TILE_COLS = 18;
 const TILE_ROWS = 32;
 
 export function renderFrame(ctx: CanvasRenderingContext2D) {
-  const canvasWidth = ctx.canvas.width;
-  const canvasHeight = ctx.canvas.height;
+  const canvas = ctx.canvas;
+  const canvasWidth = canvas.clientWidth; // logical/CSS pixels
+  const canvasHeight = canvas.clientHeight;
 
   const tileWidth = canvasWidth / TILE_COLS;
   const tileHeight = canvasHeight / TILE_ROWS;
 
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  // Draw the tile map grid
   ctx.strokeStyle = "#3a3a3a";
   ctx.lineWidth = 1;
   for (let col = 0; col <= TILE_COLS; col++) {
@@ -30,17 +31,35 @@ export function renderFrame(ctx: CanvasRenderingContext2D) {
     ctx.stroke();
   }
 
-  // Tick counter
   ctx.fillStyle = "#f0e2c0";
   ctx.font = "16px monospace";
   ctx.fillText(`Tick: ${gameState.tickId}`, 10, 20);
 
-  // Draw entities as squares on their tile
   for (const entity of gameState.entities.values()) {
-    const x = entity.position.x * tileWidth;
-    const y = entity.position.y * tileHeight;
+    const size = ENTITY_DATA[entity.entityId].size;
+    const [sizeW, sizeH] = size;
+
+    const centerX = entity.position.x * tileWidth;
+    const centerY = entity.position.y * tileHeight;
+
+    const x = centerX - (sizeW * tileWidth) / 2;
+    const y = centerY - (sizeH * tileHeight) / 2;
 
     ctx.fillStyle = "#c88a2b";
-    ctx.fillRect(x, y, tileWidth, tileHeight);
+    ctx.fillRect(x, y, tileWidth * size[0], tileHeight * size[1]);
   }
+}
+
+export function setupCanvasResolution(canvas: HTMLCanvasElement) {
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect(); // CSS size, e.g. 360x640
+
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+
+  const ctx = canvas.getContext("2d")!;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // reset before scaling again on resize
+  ctx.scale(dpr, dpr);
+
+  return ctx;
 }
