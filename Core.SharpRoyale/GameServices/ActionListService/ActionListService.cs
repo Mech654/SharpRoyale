@@ -2,7 +2,9 @@
 
 namespace Core.SharpRoyale.GameServices.ActionListService;
 
-public record ActionElement(
+public record ActionElement(ActionListOption Option, ActionListValue Values, DateTime Time);
+
+public record ActionElementResult(
     Entity Entity,
     ActionListOption Option,
     ActionListValue Values,
@@ -11,31 +13,49 @@ public record ActionElement(
 
 public static class ActionListService
 {
-    public static void AppendActionListSpawn(
-        ActionListValueSpawn values,
-        Entity entity,
-        Match match
-    )
+    public static void AppendActionListSpawn(ActionListValueSpawn values, Match match)
     {
         ArgumentNullException.ThrowIfNull(values);
-        ArgumentNullException.ThrowIfNull(entity);
         ArgumentNullException.ThrowIfNull(match);
 
-        var normalizedPosition = NormalizeCenterForSize(
-            values.Position,
-            entity.Width,
-            entity.Height
-        );
+        var normalizedPosition = NormalizeCenterForSize(values.Position, values.EntityId);
         var normalizedValues = values with { Position = normalizedPosition };
 
         match.ActionList.Add(
-            new ActionElement(entity, ActionListOption.Spawn, normalizedValues, DateTime.UtcNow)
+            new ActionElement(ActionListOption.Spawn, normalizedValues, DateTime.UtcNow)
         );
         SortActionList(match);
     }
 
-    private static Position NormalizeCenterForSize(Position position, int width, int height)
+    // System forced entity spawns ( think like the map)
+    public static void AppendActionListSpawnSpecial(ActionListValueSpawn values, Match match)
     {
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(match);
+
+        var normalizedPosition = NormalizeCenterForSize(values.Position, values.EntityId);
+        var normalizedValues = values with { Position = normalizedPosition };
+
+        match.ActionList.Add(
+            new ActionElement(ActionListOption.SpawnSpecial, normalizedValues, DateTime.UtcNow)
+        );
+        SortActionList(match);
+    }
+
+    public static void AppendActionListMove(ActionListValueMove values, Match match)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(match);
+
+        match.ActionList.Add(new ActionElement(ActionListOption.Move, values, DateTime.UtcNow));
+        SortActionList(match);
+    }
+
+    private static Position NormalizeCenterForSize(Position position, int entityId)
+    {
+        // TODO: use entityid to get the data yourself... for now:
+        int width = 99;
+        int height = 99;
         double x = SnapToParity(position.X, width);
         double y = SnapToParity(position.Y, height);
         return new Position(x, y);
@@ -52,6 +72,7 @@ public static class ActionListService
     {
         ArgumentNullException.ThrowIfNull(match);
 
+        match.ActionListResult.Clear();
         var actionList = GetResolvedActionList(match);
 
         foreach (var actionElement in actionList)
@@ -59,10 +80,13 @@ public static class ActionListService
             switch (actionElement.Option)
             {
                 case ActionListOption.Spawn:
-                    ApplySpawnAction(actionElement);
+                    ApplySpawnAction(actionElement, match);
+                    break;
+                case ActionListOption.SpawnSpecial:
+                    ApplySpawnActionSpecial(actionElement, match);
                     break;
                 case ActionListOption.Move:
-                    ApplyMoveAction(actionElement);
+                    ApplyMoveAction(actionElement, match);
                     break;
                 case ActionListOption.Attack:
                     ApplyAttackAction(actionElement);
@@ -100,6 +124,7 @@ public static class ActionListService
         return actionElement.Option switch
         {
             ActionListOption.Spawn => 0,
+            ActionListOption.SpawnSpecial => 0,
             ActionListOption.Attack => 1,
             ActionListOption.Move => 2,
             ActionListOption.Die => 3,
@@ -108,14 +133,76 @@ public static class ActionListService
         };
     }
 
-    private static void ApplySpawnAction(ActionElement actionElement)
+    private static void ApplySpawnAction(ActionElement actionElement, Match match)
     {
-        // TODO: apply spawn logic.
+        if (actionElement.Values is not ActionListValueSpawn val)
+        {
+            return;
+        }
+        Entity? success = SpawnService.SpawnService.SpawnSingularEntity(
+            val.EntityId,
+            val.player,
+            match,
+            val.Position
+        );
+
+        if (success is not null)
+        {
+            match.ActionListResult.Add(
+                new ActionElementResult(
+                    success,
+                    actionElement.Option,
+                    actionElement.Values,
+                    actionElement.Time
+                )
+            );
+        }
     }
 
-    private static void ApplyMoveAction(ActionElement actionElement)
+    private static void ApplySpawnActionSpecial(ActionElement actionElement, Match match)
     {
-        // TODO: apply move logic.
+        if (actionElement.Values is not ActionListValueSpawn val)
+        {
+            return;
+        }
+
+        Entity? success = SpawnService.SpawnService.SpawnSingularEntitySpecial(
+            val.EntityId,
+            val.player,
+            match,
+            val.Position
+        );
+
+        if (success is not null)
+        {
+            match.ActionListResult.Add(
+                new ActionElementResult(
+                    success,
+                    actionElement.Option,
+                    actionElement.Values,
+                    actionElement.Time
+                )
+            );
+        }
+    }
+
+    private static void ApplyMoveAction(ActionElement actionElement, Match match)
+    {
+        if (actionElement.Values is not ActionListValueMove move)
+        {
+            return;
+        }
+
+        NavigationService.NavigationService.MoveEntity(move.Entity, move.Position);
+
+        match.ActionListResult.Add(
+            new ActionElementResult(
+                move.Entity,
+                actionElement.Option,
+                actionElement.Values,
+                actionElement.Time
+            )
+        );
     }
 
     private static void ApplyAttackAction(ActionElement actionElement)

@@ -1,17 +1,37 @@
-﻿using Core.SharpRoyale.GameServices.SpawnService;
+﻿using Core.SharpRoyale.GameServices.ActionListService;
+using Core.SharpRoyale.GameServices.SpawnService;
+
 namespace Core.SharpRoyale.GameServices.UserInteractionService;
 
 public static class UserInteractionService
 {
-    public static bool ApplyUserInteraction(UserInteractionElement userInteractionElement)
+    public static void ApplyUserInteraction(UserInteractionElement userInteractionElement)
     {
         switch (userInteractionElement.action)
         {
             case UserInteractionOption.Spawn:
-                SpawnService.SpawnService.SpawnSingularEntity(userInteractionElement);
-                return true;
+                ApplyUserSpawnAction(userInteractionElement);
+                break;
         }
+    }
 
-        return false;
+    private static void ApplyUserSpawnAction(UserInteractionElement userInteractionElement)
+    {
+        int? entityId = userInteractionElement.values.EntityId;
+        if (entityId is null)
+            return;
+
+        Match match = userInteractionElement.match;
+        Player player = match.GetPlayerFromId(userInteractionElement.playerid);
+        Entity entity = DeckService.DeckService.GetEntityFromId(entityId.Value, player.Id, match);
+
+        ActionListService.ActionListService.AppendActionListSpawn(
+            new ActionListValueSpawn(
+                new Position(0, 0),
+                userInteractionElement.values.EntityId,
+                player
+            ),
+            match
+        );
     }
 }

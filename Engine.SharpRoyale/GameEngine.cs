@@ -38,10 +38,10 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
         {
             var sw = Stopwatch.StartNew();
 
-            // Apply User Actions
+            // Apply User Actions TODO: Should only append ... fix
             foreach (UserInteractionElement userInteraction in UserInteractionList)
             {
-                SpawnService.SpawnSingularEntity(userInteraction);
+                UserInteractionService.ApplyUserInteraction(userInteraction);
             }
 
             // Collect Action
@@ -50,8 +50,6 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
                 entity.Tick();
             }
 
-            var resolvedActionList = ActionListService.GetResolvedActionList(m);
-
             // Apply Action
             ActionListService.ApplyActionList(m);
 
@@ -59,7 +57,7 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
             var tickResult = tickClientFeedback.BuildTickResult(
                 m.MatchId,
                 tickId,
-                resolvedActionList
+                m.ActionListResult
             );
             await tickClientFeedback.PublishTickResultAsync(tickResult);
             tickId++;

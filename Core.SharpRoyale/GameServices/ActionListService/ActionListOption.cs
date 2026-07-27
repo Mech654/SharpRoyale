@@ -3,6 +3,7 @@
 public enum ActionListOption
 {
     Spawn,
+    SpawnSpecial,
     Move,
     Attack,
     Die,
@@ -13,4 +14,9 @@ public abstract record ActionListValue();
 
 public readonly record struct Position(double X, double Y);
 
-public record ActionListValueSpawn(Position Position, EntityId EntityId) : ActionListValue;
+// Note that values like EntityId and id are always send to client so you don't need it explicitly here
+// For more info look at TickClientFeedback.cs
+public record ActionListValueSpawn(Position Position, int EntityId, Player player)
+    : ActionListValue;
+
+public record ActionListValueMove(Position Position, Entity Entity) : ActionListValue;

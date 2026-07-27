@@ -18,7 +18,7 @@ public class TickClientFeedback(ITickResultPublisher tickResultPublisher)
     public TickResultDto BuildTickResult(
         int matchId,
         long tickId,
-        IReadOnlyList<ActionElement> resolvedActions
+        IReadOnlyList<ActionElementResult> resolvedActions
     )
     {
         ArgumentNullException.ThrowIfNull(resolvedActions);

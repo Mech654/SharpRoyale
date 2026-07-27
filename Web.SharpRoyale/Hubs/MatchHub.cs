@@ -9,12 +9,12 @@ namespace Web.SharpRoyale.Hubs;
 [Authorize]
 public class MatchHub(MatchService matchService) : Hub
 {
-    private Player? _player;
+    private int? _player; //TODO: Should this really be a Player? or just int...
     private int? _matchId;
 
     public override async Task OnConnectedAsync()
     {
-        _player = DbHelper.GetPlayerFromId(GetPlayerId(Context.User));
+        _player = GetPlayerId(Context.User);
 
         var matchId = GetMatchIdFromRoute(Context.GetHttpContext());
         if (!matchService.CheckMatchExists(matchId))
@@ -59,17 +59,27 @@ public class MatchHub(MatchService matchService) : Hub
     public record Result(bool Success, string? Error = null)
     {
         public static Result Ok() => new(true);
+
         public static Result Fail(string error) => new(false, error);
     }
+
     public Result SendPlayerAction(string action, object values)
     {
         UserInteractionOption? userInteractionOption = MatchUserInteractionOption(action);
 
-        if (userInteractionOption == null) return Result.Fail("Invalid Action Option");
-        if (_player == null) return Result.Fail("Player not assigned");
-        if (_matchId == null) return Result.Fail("Match not assigned");
+        if (userInteractionOption == null)
+            return Result.Fail("Invalid Action Option");
+        if (_player == null)
+            return Result.Fail("Player not assigned");
+        if (_matchId == null)
+            return Result.Fail("Match not assigned");
 
-        matchService.SendPlayerActionToEngine(_matchId.Value, _player, userInteractionOption.Value, values);
+        matchService.SendPlayerActionToEngine(
+            _matchId.Value,
+            _player.Value,
+            userInteractionOption.Value,
+            values
+        );
 
         return Result.Ok();
     }
@@ -81,5 +91,4 @@ public class MatchHub(MatchService matchService) : Hub
 
         return null;
     }
-
 }

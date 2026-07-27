@@ -1,3 +1,8 @@
 ﻿namespace Core.SharpRoyale.GameServices.UserInteractionService;
 
-public record UserInteractionElement(Match match, Player player, UserInteractionOption action, dynamic values);
+public record UserInteractionElement(
+    Match match,
+    int playerid,
+    UserInteractionOption action,
+    dynamic values
+);
