@@ -1,14 +1,17 @@
-﻿namespace Core.SharpRoyale;
+﻿using Core.SharpRoyale.GameServices.ActionListService;
 
-public abstract class Entity(int id)
+namespace Core.SharpRoyale;
+
+public abstract class Entity(int Owner, int id)
 {
     public int Id { get; } = id;
     public abstract int EntityId { get; }
-    public abstract int Owner { get; set; }
+    public int Owner { get; } = Owner;
 
-    public Entity? FollowTarget { get; set; }
-
-    public abstract (ushort x, ushort y) Pos { get; set; }
+    public Position Pos { get; set; }
+    public abstract int Speed { get; }
+    public double MoveAccumulator { get; set; }
+    public double TickRate = 1.0 / 60;
 
     public abstract int Width { get; }
     public abstract int Height { get; }
@@ -27,4 +30,6 @@ public abstract class Entity(int id)
 public enum EntityId
 {
     Tower = 1,
+    King = 2,
+    Larry = 3,
 }

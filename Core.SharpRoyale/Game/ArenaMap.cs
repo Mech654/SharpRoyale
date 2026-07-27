@@ -1,5 +1,4 @@
-﻿using Core.SharpRoyale.Entities;
-using Core.SharpRoyale.GameServices.ActionListService;
+﻿using Core.SharpRoyale.GameServices.ActionListService;
 
 namespace Core.SharpRoyale;
 
@@ -35,44 +34,41 @@ public class ArenaMap
 
     public ArenaMap AddPlayerTowers((Player p1, Player p2) players, Match match)
     {
-        // Player 1 towers (bottom)
-        ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(9, 30), EntityId.Tower), // King, pulled back near bottom edge
-            new King(players.p1.Id, match),
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(2, 2), (int)EntityId.Larry, players.p1),
             match
         );
-        ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(3, 28), EntityId.Tower),
-            new Tower(players.p1.Id, match),
-            match
-        ); // Left Princess
-        ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(14, 28), EntityId.Tower),
-            new Tower(players.p1.Id, match),
-            match
-        ); // Right Princess
 
-        // Player 2 towers (top)
-        ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(9, 2), EntityId.Tower), // King, pulled back near top edge
-            new King(players.p2.Id, match),
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(9, 30), (int)EntityId.King, players.p1),
             match
-        ); // King Tower
-        ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(3, 4), EntityId.Tower),
-            new Tower(players.p2.Id, match),
+        );
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(3, 28), (int)EntityId.Tower, players.p1),
             match
-        ); // Left Princess
-        ActionListService.AppendActionListSpawn(
-            new ActionListValueSpawn(new Position(14, 4), EntityId.Tower),
-            new Tower(players.p2.Id, match),
+        );
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(14, 28), (int)EntityId.Tower, players.p1),
             match
-        ); // Right Princess
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(9, 2), (int)EntityId.King, players.p2),
+            match
+        );
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(3, 4), (int)EntityId.Tower, players.p2),
+            match
+        );
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(14, 4), (int)EntityId.Tower, players.p2),
+            match
+        );
 
         return this;
     }
 
-    public bool CheckIfEntityCanBeDeployed(Entity entity)
+    public bool CheckIfEntityCanBeDeployed(int entityId, Position pos, Match match)
     {
         //TODO: Another Days Work
         return true;

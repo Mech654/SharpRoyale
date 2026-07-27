@@ -1,23 +1,43 @@
-﻿using Core.SharpRoyale.GameServices.UserInteractionService;
+﻿using Core.SharpRoyale.GameServices.ActionListService;
+using Core.SharpRoyale.GameServices.UserInteractionService;
 
 namespace Core.SharpRoyale.GameServices.SpawnService;
 
 public static class SpawnService
 {
-    public static void SpawnSingularEntity(UserInteractionElement userInteractionElement)
+    public static Entity? SpawnSingularEntity(
+        int entityId,
+        Player player,
+        Match match,
+        Position position
+    )
     {
-        int? entityId = userInteractionElement.values.Entity;
-        if (entityId is null) return;
-        
-        Player player = userInteractionElement.player;
-        Match match = userInteractionElement.match;
-        
-        Entity entity = DeckService.DeckService.GetEntityFromId(entityId.Value, player.Id, match);
-        
-        if (!player.Deck.AvailableEntities.Contains(entity)) return;
-        if (!match.Map.CheckIfEntityCanBeDeployed(entity)) return;
-        if (!(player.Elixir >= entity.ElixirCost)) return;
+        if (!player.Deck.AvailableEntities.Contains(entityId))
+            return null;
+        if (!match.Map.CheckIfEntityCanBeDeployed(entityId, position, match))
+            return null;
+        if (!(player.Elixir >= -1)) //TODO
+            return null;
 
-        userInteractionElement.match.Map.Entities.Add(entity);
+        Console.WriteLine($"SpawnSingularEntity({entityId}, {player})");
+        Entity entity = DeckService.DeckService.GetEntityFromId(entityId, player.Id, match);
+        match.Map.Entities.Add(entity);
+        return entity;
+    }
+
+    public static Entity? SpawnSingularEntitySpecial(
+        int entityId,
+        Player player,
+        Match match,
+        Position position
+    )
+    {
+        if (!match.Map.CheckIfEntityCanBeDeployed(entityId, position, match))
+            return null;
+
+        Console.WriteLine($"SpawnSingularEntitySpecial({entityId}, {player})");
+        Entity entity = DeckService.DeckService.GetEntityFromId(entityId, player.Id, match); //TODO: Implement factory instead of this crap
+        match.Map.Entities.Add(entity);
+        return entity;
     }
 }

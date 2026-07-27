@@ -3,20 +3,18 @@ using Core.SharpRoyale.GameServices.NavigationService;
 
 namespace Core.SharpRoyale.Entities;
 
-public class Tower(int owner, Match match) : Entity(match.GetNextEntityId())
+public class Tower(int owner, Match match) : Entity(owner, match.GetNextEntityId())
 {
     public override int EntityId { get; } = 1;
     public override int Width { get; } = 3;
     public override int Height { get; } = 3;
     public override int ElixirCost { get; } = 0;
     public override bool RestrictedDeployment { get; } = true;
-
-    public override int Owner { get; set; } = owner;
-    public override (ushort x, ushort y) Pos { get; set; }
+    public override int Speed { get; } = 0;
 
     public override Entity ProcessDeployment(ushort x, ushort y)
     {
-        Pos = (x, y);
+        Pos = new Position(x, y);
         return this;
     }
 
@@ -30,12 +28,7 @@ public class Tower(int owner, Match match) : Entity(match.GetNextEntityId())
         throw new NotImplementedException();
     }
 
-    public override void Tick()
-    {
-        // Dummy Section
-        var destination = NavigationService.GetNextNavigation(this, match);
-        ApplyAction(ActionListOption.Move, destination);
-    }
+    public override void Tick() { }
 
     private void ApplyAction(ActionListOption option, object values)
     {

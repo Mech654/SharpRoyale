@@ -6,6 +6,8 @@ public class Match
     public (Player p1, Player p2) Players { get; }
     public ArenaMap Map { get; }
     public List<GameServices.ActionListService.ActionElement> ActionList { get; } = [];
+    public List<GameServices.ActionListService.ActionElementResult> ActionListResult { get; } = [];
+
     private int NextEntityId = 0;
 
     public Match(int matchId, (Player p1, Player p2) players)
@@ -19,5 +21,12 @@ public class Match
     {
         NextEntityId++;
         return NextEntityId - 1;
+    }
+
+    public Player GetPlayerFromId(int id)
+    {
+        if (Players.p1.Id == id)
+            return Players.p1;
+        return Players.p2;
     }
 }
