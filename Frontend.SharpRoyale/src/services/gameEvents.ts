@@ -16,7 +16,10 @@ export interface MatchEvent {
 
 interface SpawnValues {
   position: { x: number; y: number };
-  entityId: number;
+}
+
+interface MoveValues {
+  position: { x: number; y: number };
 }
 
 interface AttackValues {
@@ -27,7 +30,16 @@ function isSpawnValues(val: unknown): val is SpawnValues {
   if (typeof val !== "object" || val === null) return false;
   const obj = val as Record<string, unknown>;
 
-  if (typeof obj.entityId !== "number") return false;
+  const pos = obj.position;
+  if (typeof pos !== "object" || pos === null) return false;
+  const posObj = pos as Record<string, unknown>;
+
+  return typeof posObj.x === "number" && typeof posObj.y === "number";
+}
+
+function isMoveValues(val: unknown): val is MoveValues {
+  if (typeof val !== "object" || val === null) return false;
+  const obj = val as Record<string, unknown>;
 
   const pos = obj.position;
   if (typeof pos !== "object" || pos === null) return false;
@@ -42,6 +54,16 @@ export function applyMatchEvent(event: MatchEvent) {
       case 0: // spawn
         console.log("Applying spawn action:", action);
         applySpawnAction(action);
+        break;
+
+      case 1: // spawn
+        console.log("Applying spawn action:", action);
+        applySpawnAction(action);
+        break;
+
+      case 2: // move
+        console.log("Applying move action:", action);
+        applyMoveAction(action);
         break;
     }
   }
@@ -61,4 +83,18 @@ function applySpawnAction(action: MatchAction) {
     lastAction: action,
     position: action.values.position,
   });
+}
+
+function applyMoveAction(action: MatchAction) {
+  if (!isMoveValues(action.values)) {
+    console.error("Invalid move values:", action.values);
+    return;
+  }
+  const entity = gameState.entities.get(action.id);
+  if (!entity) {
+    console.error("Entity not found for move action:", action.id);
+    return;
+  }
+  entity.position = action.values.position;
+  entity.lastAction = action;
 }

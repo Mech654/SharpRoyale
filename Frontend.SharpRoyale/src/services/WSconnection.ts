@@ -12,7 +12,9 @@ export function connectToMatch(
     .build();
 
   connection.on("TickResult", (data) => {
-    console.log("Received MatchEvent:", data);
+    if (data.actions.length > 0) {
+      console.log("Received MatchEvent:", data);
+    }
     onEvent(data);
   });
 

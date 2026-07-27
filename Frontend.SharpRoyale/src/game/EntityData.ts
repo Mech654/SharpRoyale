@@ -4,4 +4,5 @@ export const ENTITY_DATA: Record<
 > = {
   1: { name: "Tower", size: [3, 3] },
   2: { name: "King", size: [4, 4] },
+  3: { name: "Larry", size: [1, 1] },
 };
