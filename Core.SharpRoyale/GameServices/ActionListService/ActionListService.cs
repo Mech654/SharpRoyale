@@ -53,9 +53,7 @@ public static class ActionListService
 
     private static Position NormalizeCenterForSize(Position position, int entityId)
     {
-        // TODO: use entityid to get the data yourself... for now:
-        int width = 99;
-        int height = 99;
+        (int width, int height) = Entities.EntityCatalog.GetSize(entityId);
         double x = SnapToParity(position.X, width);
         double y = SnapToParity(position.Y, height);
         return new Position(x, y);
