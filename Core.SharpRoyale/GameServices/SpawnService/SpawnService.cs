@@ -21,6 +21,8 @@ public static class SpawnService
 
         Console.WriteLine($"SpawnSingularEntity({entityId}, {player})");
         Entity entity = DeckService.DeckService.GetEntityFromId(entityId, player.Id, match);
+        entity.IsMirrored = player.IsMirrored;
+        entity.Pos = position;
         match.Map.Entities.Add(entity);
         return entity;
     }
@@ -37,6 +39,8 @@ public static class SpawnService
 
         Console.WriteLine($"SpawnSingularEntitySpecial({entityId}, {player})");
         Entity entity = DeckService.DeckService.GetEntityFromId(entityId, player.Id, match); //TODO: Implement factory instead of this crap
+        entity.IsMirrored = player.IsMirrored;
+        entity.Pos = position;
         match.Map.Entities.Add(entity);
         return entity;
     }

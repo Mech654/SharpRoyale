@@ -13,13 +13,30 @@ public class MatchService(GameEngine engine)
     public int CreateMatch((Player p1, Player p2) match)
     {
         var nextMatchId = Interlocked.Increment(ref _counter);
+        var orderedPlayers = GetOrderedPlayers(match);
 
-        var newMatch = new Match(matchId: nextMatchId, players: match);
+        var newMatch = new Match(matchId: nextMatchId, players: orderedPlayers);
         _matches.TryAdd(nextMatchId, newMatch);
 
         _ = engine.RunGameLoop(newMatch);
 
         return nextMatchId;
+    }
+
+    private static (Player p1, Player p2) GetOrderedPlayers((Player p1, Player p2) match)
+    {
+        bool mirrorFirstPlayer = Random.Shared.Next(2) == 0;
+
+        if (mirrorFirstPlayer)
+        {
+            match.p1.IsMirrored = true;
+            match.p2.IsMirrored = false;
+            return (match.p2, match.p1);
+        }
+
+        match.p1.IsMirrored = false;
+        match.p2.IsMirrored = true;
+        return match;
     }
 
     public bool CheckMatchExists(int matchId)

@@ -35,7 +35,12 @@ public class ArenaMap
     public ArenaMap AddPlayerTowers((Player p1, Player p2) players, Match match)
     {
         ActionListService.AppendActionListSpawnSpecial(
-            new ActionListValueSpawn(new Position(2, 2), (int)EntityId.Larry, players.p1),
+            new ActionListValueSpawn(new Position(2, 25), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(12, 2), (int)EntityId.Larry, players.p2),
             match
         );
 

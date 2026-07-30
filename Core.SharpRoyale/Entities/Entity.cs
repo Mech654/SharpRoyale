@@ -7,6 +7,7 @@ public abstract class Entity(int Owner, int id)
     public int Id { get; } = id;
     public abstract int EntityId { get; }
     public int Owner { get; } = Owner;
+    public bool IsMirrored { get; set; }
 
     public Position Pos { get; set; }
     public abstract int Speed { get; }

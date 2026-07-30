@@ -30,7 +30,7 @@ public class Larry(int owner, Match match) : Entity(owner, match.GetNextEntityId
 
     public override void Tick()
     {
-        Console.WriteLine($"LARRY: {EntityId}");
+        Console.WriteLine($"LARRY: {Id}");
         MoveAccumulator += Speed * TickRate;
         Console.WriteLine(MoveAccumulator);
 
