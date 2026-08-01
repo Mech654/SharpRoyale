@@ -11,6 +11,7 @@ public class Larry(int owner, Match match) : Entity(owner, match.GetNextEntityId
     public override int ElixirCost { get; } = 1;
     public override bool RestrictedDeployment { get; } = true;
     public override int Speed { get; } = 1;
+    public override bool IsConstruction { get; } = false;
 
     public override Entity ProcessDeployment(ushort x, ushort y)
     {
@@ -30,9 +31,7 @@ public class Larry(int owner, Match match) : Entity(owner, match.GetNextEntityId
 
     public override void Tick()
     {
-        Console.WriteLine($"LARRY: {Id}");
         MoveAccumulator += Speed * TickRate;
-        Console.WriteLine(MoveAccumulator);
 
         while (MoveAccumulator >= 1.0)
         {

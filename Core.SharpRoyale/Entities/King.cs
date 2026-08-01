@@ -11,6 +11,7 @@ public class King(int owner, Match match) : Entity(owner, match.GetNextEntityId(
     public override int ElixirCost { get; } = 0;
     public override bool RestrictedDeployment { get; } = true;
     public override int Speed { get; } = 0;
+    public override bool IsConstruction { get; } = false;
 
     public override Entity ProcessDeployment(ushort x, ushort y)
     {

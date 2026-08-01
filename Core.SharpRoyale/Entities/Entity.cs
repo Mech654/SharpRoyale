@@ -17,6 +17,7 @@ public abstract class Entity(int Owner, int id)
     public abstract int Width { get; }
     public abstract int Height { get; }
     public abstract int ElixirCost { get; }
+    public abstract bool IsConstruction { get; }
     public abstract bool RestrictedDeployment { get; }
 
     public abstract Entity ProcessDeployment(ushort x, ushort y);

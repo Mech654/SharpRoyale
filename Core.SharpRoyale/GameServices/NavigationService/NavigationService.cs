@@ -4,10 +4,7 @@ namespace Core.SharpRoyale.GameServices.NavigationService;
 
 public static class NavigationService
 {
-    private const double BridgeTargetYOffset = -0.5;
-    private const double BridgeExitOffset = 0;
-
-    private static readonly Position[] _bridgePositions =
+    private static readonly Position[] BridgePositions =
     {
         new Position(3.5, 16),
         new Position(14.5, 16),
@@ -34,13 +31,41 @@ public static class NavigationService
         return new Position(entity.Pos.X + stepX, entity.Pos.Y + stepY);
     }
 
+    public static Position GetClosestEnemyTower(Entity entity, Match match)
+    {
+        double closestDistanceSquared = double.MaxValue;
+
+        Position navTarget = new Position(0, 0);
+        List<Position> candidates = match
+            .Map.Entities.Where(xEntity =>
+                xEntity.EntityId is 1 or 2 && xEntity.Owner != entity.Owner
+            )
+            .Select(xEntity => xEntity.Pos)
+            .ToList();
+
+        foreach (Position tower in candidates)
+        {
+            double towerDx = tower.X - entity.Pos.X;
+            double towerDy = tower.Y - entity.Pos.Y;
+            double distanceSquared = towerDx * towerDx + towerDy * towerDy;
+
+            if (distanceSquared < closestDistanceSquared)
+            {
+                closestDistanceSquared = distanceSquared;
+                navTarget = tower;
+            }
+        }
+
+        return navTarget;
+    }
+
     private static Position GetNavigationTarget(Entity entity, Match match)
     {
         double closestDistanceSquared = double.MaxValue;
 
         // TODO: Other factors such as enemy presence or other constructions will come above
-        Position navTarget = _bridgePositions[0];
-        foreach (Position bridgePosition in _bridgePositions)
+        Position navTarget = BridgePositions[0];
+        foreach (Position bridgePosition in BridgePositions)
         {
             double bridgeDx = bridgePosition.X - entity.Pos.X;
             double bridgeDy = bridgePosition.Y - entity.Pos.Y;
@@ -53,14 +78,14 @@ public static class NavigationService
             }
         }
 
-        if (IsOnBridge(entity, navTarget))
+        if (!IsPastBridges(entity))
         {
             return GetExitBridgeTarget(entity, navTarget);
         }
 
         if (IsPastBridges(entity))
         {
-            return entity.Pos; // Just stop for not TODO:
+            return GetClosestEnemyTower(entity, match);
         }
 
         navTarget = GetEnterBridgeTarget(entity, navTarget);
@@ -68,18 +93,11 @@ public static class NavigationService
         return navTarget;
     }
 
-    private static bool IsOnBridge(Entity entity, Position bridgePosition)
-    {
-        return entity.IsMirrored
-            ? entity.Pos.Y >= bridgePosition.Y - 1
-            : entity.Pos.Y <= bridgePosition.Y + 1;
-    }
-
     private static bool IsPastBridges(Entity entity)
     {
         return entity.IsMirrored
-            ? entity.Pos.Y >= _bridgePositions[0].Y - 1
-            : entity.Pos.Y <= _bridgePositions[0].Y + 1;
+            ? entity.Pos.Y >= BridgePositions[0].Y + 1
+            : entity.Pos.Y <= BridgePositions[0].Y - 1;
     }
 
     private static Position GetExitBridgeTarget(Entity entity, Position bridgePosition)
