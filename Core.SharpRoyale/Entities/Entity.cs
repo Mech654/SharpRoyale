@@ -16,9 +16,12 @@ public abstract class Entity(int Owner, int id)
 
     public abstract int Width { get; }
     public abstract int Height { get; }
+    public abstract float HitboxRadius { get; } // 0 for none, none for construction types, as they are square hitboxes
     public abstract int ElixirCost { get; }
     public abstract bool IsConstruction { get; }
     public abstract bool RestrictedDeployment { get; }
+    public abstract ushort AttackDistance { get; }
+    public int AggroRange { get; } = 6;
 
     public abstract Entity ProcessDeployment(ushort x, ushort y);
 

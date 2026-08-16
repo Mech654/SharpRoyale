@@ -45,6 +45,11 @@ public class ArenaMap
         );
 
         ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(2, 5), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
             new ActionListValueSpawn(new Position(9, 30), (int)EntityId.King, players.p1),
             match
         );

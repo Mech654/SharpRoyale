@@ -12,6 +12,8 @@ public class Larry(int owner, Match match) : Entity(owner, match.GetNextEntityId
     public override bool RestrictedDeployment { get; } = true;
     public override int Speed { get; } = 1;
     public override bool IsConstruction { get; } = false;
+    public override float HitboxRadius { get; } = 0.5f;
+    public override ushort AttackDistance { get; } = 0;
 
     public override Entity ProcessDeployment(ushort x, ushort y)
     {

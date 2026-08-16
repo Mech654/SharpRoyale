@@ -31,22 +31,22 @@ public static class NavigationService
         return new Position(entity.Pos.X + stepX, entity.Pos.Y + stepY);
     }
 
-    public static Position GetClosestEnemyTower(Entity entity, Match match)
+    private static Entity GetClosestEnemyTower(Entity entity, Match match)
     {
+        Console.WriteLine("GetClosestTowerTriggered");
         double closestDistanceSquared = double.MaxValue;
 
-        Position navTarget = new Position(0, 0);
-        List<Position> candidates = match
+        Entity navTarget = entity;
+        List<Entity> candidates = match
             .Map.Entities.Where(xEntity =>
                 xEntity.EntityId is 1 or 2 && xEntity.Owner != entity.Owner
             )
-            .Select(xEntity => xEntity.Pos)
             .ToList();
 
-        foreach (Position tower in candidates)
+        foreach (Entity tower in candidates)
         {
-            double towerDx = tower.X - entity.Pos.X;
-            double towerDy = tower.Y - entity.Pos.Y;
+            double towerDx = tower.Pos.X - entity.Pos.X;
+            double towerDy = tower.Pos.Y - entity.Pos.Y;
             double distanceSquared = towerDx * towerDx + towerDy * towerDy;
 
             if (distanceSquared < closestDistanceSquared)
@@ -64,6 +64,28 @@ public static class NavigationService
         double closestDistanceSquared = double.MaxValue;
 
         // TODO: Other factors such as enemy presence or other constructions will come above
+        Entity? closestEntity = null;
+        double closestEntityDistance = Double.MaxValue;
+
+        foreach (
+            Entity target in match.Map.Entities.Where(xEntity => xEntity.Owner != entity.Owner)
+        )
+        {
+            if (IsWithinAggroRange(entity, target))
+            {
+                if (closestEntity is null)
+                {
+                    closestEntity = target;
+                    closestEntityDistance = GetDistanceToHitbox(entity, target);
+                }
+                else if (GetDistanceToHitbox(entity, target) < closestEntityDistance)
+                {
+                    closestEntity = target;
+                    closestEntityDistance = GetDistanceToHitbox(entity, target);
+                }
+            }
+        }
+
         Position navTarget = BridgePositions[0];
         foreach (Position bridgePosition in BridgePositions)
         {
@@ -80,15 +102,65 @@ public static class NavigationService
 
         if (!IsPastBridges(entity))
         {
-            return GetExitBridgeTarget(entity, navTarget);
+            if (closestEntity is not null && IsPastBridges(closestEntity))
+                return GetCollisionPoint(entity, closestEntity);
+            return GetEnterBridgeTarget(entity, navTarget);
         }
 
         if (IsPastBridges(entity))
         {
-            return GetClosestEnemyTower(entity, match);
-        }
+            if (closestEntity is not null)
+            {
+                if (!IsPastBridges(closestEntity))
+                    return GetCollisionPoint(entity, closestEntity);
+                if (IsPastBridges(closestEntity))
+                {
+                    if (entity.IsMirrored)
+                    {
+                        Console.WriteLine("mirrored");
+                        if (entity.Pos.Y <= BridgePositions[0].Y + 2)
+                        {
+                            double bridgeDistance = GetDistanceToPosition(
+                                entity.Pos,
+                                GetEnterBridgeTarget(entity, navTarget)
+                            );
+                            double enemyDistance = GetDistanceToPosition(
+                                entity.Pos,
+                                closestEntity.Pos
+                            );
 
-        navTarget = GetEnterBridgeTarget(entity, navTarget);
+                            if (enemyDistance <= bridgeDistance + 2)
+                                return GetCollisionPoint(entity, closestEntity);
+                            return GetEnterBridgeTarget(entity, navTarget);
+                        }
+                    }
+
+                    if (!entity.IsMirrored)
+                    {
+                        if (entity.Pos.Y >= BridgePositions[0].Y - 2)
+                        {
+                            Console.WriteLine("not mirrored");
+                            double bridgeDistance = GetDistanceToPosition(
+                                entity.Pos,
+                                GetEnterBridgeTarget(entity, navTarget)
+                            );
+                            double enemyDistance = GetDistanceToPosition(
+                                entity.Pos,
+                                closestEntity.Pos
+                            );
+
+                            if (enemyDistance <= bridgeDistance + 2)
+                                return GetCollisionPoint(entity, closestEntity);
+                            return GetEnterBridgeTarget(entity, navTarget);
+                        }
+                    }
+
+                    return GetExitBridgeTarget(entity, navTarget);
+                }
+                // need to return closest bridge position
+            }
+            return GetCollisionPoint(entity, GetClosestEnemyTower(entity, match));
+        }
 
         return navTarget;
     }
@@ -96,8 +168,8 @@ public static class NavigationService
     private static bool IsPastBridges(Entity entity)
     {
         return entity.IsMirrored
-            ? entity.Pos.Y >= BridgePositions[0].Y + 1
-            : entity.Pos.Y <= BridgePositions[0].Y - 1;
+            ? entity.Pos.Y >= BridgePositions[0].Y - 2
+            : entity.Pos.Y <= BridgePositions[0].Y + 2;
     }
 
     private static Position GetExitBridgeTarget(Entity entity, Position bridgePosition)
@@ -131,5 +203,84 @@ public static class NavigationService
         // keeping it simple for now
         entity.Pos = newPos;
         return entity;
+    }
+
+    public static Position GetCollisionPoint(Entity entity, Entity target)
+    {
+        double dx = target.Pos.X - entity.Pos.X;
+        double dy = target.Pos.Y - entity.Pos.Y;
+
+        double distance = Math.Sqrt(dx * dx + dy * dy);
+
+        if (distance == 0)
+            return entity.Pos;
+
+        double directionX = dx / distance;
+        double directionY = dy / distance;
+
+        double collisionDistance;
+
+        if (target.IsConstruction)
+        {
+            // Distance from target center to its edge in the direction of the entity
+            double halfWidth = target.Width / 2.0;
+            double halfHeight = target.Height / 2.0;
+
+            double distanceX = halfWidth / Math.Abs(directionX);
+            double distanceY = halfHeight / Math.Abs(directionY);
+
+            double targetEdgeDistance = Math.Min(distanceX, distanceY);
+
+            // Entity is circular, so stop when its hitbox touches the construction.
+            collisionDistance = targetEdgeDistance - entity.HitboxRadius;
+        }
+        else
+        {
+            // Both entities have circular hitboxes.
+            collisionDistance = distance - entity.HitboxRadius - target.HitboxRadius;
+        }
+
+        collisionDistance = Math.Max(collisionDistance, 0);
+
+        return new Position(
+            entity.Pos.X + directionX * collisionDistance,
+            entity.Pos.Y + directionY * collisionDistance
+        );
+    }
+
+    private static double GetDistanceToHitbox(Entity a, Entity b)
+    {
+        double dx = a.Pos.X - b.Pos.X;
+        double dy = a.Pos.Y - b.Pos.Y;
+
+        double centerDistance = Math.Sqrt(dx * dx + dy * dy);
+
+        return Math.Max(centerDistance - a.HitboxRadius - b.HitboxRadius, 0);
+    }
+
+    private static double GetDistanceToConstruction(Entity a, Entity b)
+    {
+        double dx = Math.Abs(a.Pos.X - b.Pos.X) - b.Width / 2.0;
+        double dy = Math.Abs(a.Pos.Y - b.Pos.Y) - b.Height / 2.0;
+
+        dx = Math.Max(dx, 0);
+        dy = Math.Max(dy, 0);
+
+        return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    private static double GetDistanceToPosition(Position a, Position b)
+    {
+        double dx = a.X - b.X;
+        double dy = a.Y - b.Y;
+
+        double centerDistance = Math.Sqrt(dx * dx + dy * dy);
+
+        return Math.Max(centerDistance, 0);
+    }
+
+    private static bool IsWithinAggroRange(Entity entity, Entity target)
+    {
+        return (GetDistanceToHitbox(entity, target) <= entity.AggroRange);
     }
 }
