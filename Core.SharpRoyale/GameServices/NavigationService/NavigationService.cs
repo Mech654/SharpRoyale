@@ -88,7 +88,7 @@ public static class NavigationService
             }
         }
 
-        Position navTarget = BridgePositions[0];
+        Position closestBridge = BridgePositions[0];
         foreach (Position bridgePosition in BridgePositions)
         {
             double bridgeDx = bridgePosition.X - entity.Pos.X;
@@ -98,7 +98,7 @@ public static class NavigationService
             if (distanceSquared < closestDistanceSquared)
             {
                 closestDistanceSquared = distanceSquared;
-                navTarget = bridgePosition;
+                closestBridge = bridgePosition;
             }
         }
 
@@ -106,7 +106,7 @@ public static class NavigationService
         {
             if (closestEntity is not null && IsPastBridges(closestEntity))
                 return GetCollisionPoint(entity, closestEntity);
-            return GetEnterBridgeTarget(entity, navTarget);
+            return GetEnterBridgeTarget(entity, closestBridge);
         }
 
         if (IsPastBridges(entity))
@@ -124,7 +124,7 @@ public static class NavigationService
                         {
                             double bridgeDistance = GetDistanceToPosition(
                                 entity.Pos,
-                                GetEnterBridgeTarget(entity, navTarget)
+                                GetEnterBridgeTarget(entity, closestBridge)
                             );
                             double enemyDistance = GetDistanceToPosition(
                                 entity.Pos,
@@ -133,7 +133,7 @@ public static class NavigationService
 
                             if (enemyDistance <= bridgeDistance + 2)
                                 return GetCollisionPoint(entity, closestEntity);
-                            return GetEnterBridgeTarget(entity, navTarget);
+                            return GetEnterBridgeTarget(entity, closestBridge);
                         }
                     }
 
@@ -144,7 +144,7 @@ public static class NavigationService
                             Console.WriteLine("not mirrored");
                             double bridgeDistance = GetDistanceToPosition(
                                 entity.Pos,
-                                GetEnterBridgeTarget(entity, navTarget)
+                                GetEnterBridgeTarget(entity, closestBridge)
                             );
                             double enemyDistance = GetDistanceToPosition(
                                 entity.Pos,
@@ -153,18 +153,18 @@ public static class NavigationService
 
                             if (enemyDistance <= bridgeDistance + 2)
                                 return GetCollisionPoint(entity, closestEntity);
-                            return GetEnterBridgeTarget(entity, navTarget);
+                            return GetEnterBridgeTarget(entity, closestBridge);
                         }
                     }
 
-                    return GetExitBridgeTarget(entity, navTarget);
+                    return GetExitBridgeTarget(entity, closestBridge);
                 }
                 // need to return closest bridge position
             }
             return GetCollisionPoint(entity, GetClosestEnemyTower(entity, match));
         }
 
-        return navTarget;
+        return closestBridge;
     }
 
     private static bool IsPastBridges(Entity entity)
