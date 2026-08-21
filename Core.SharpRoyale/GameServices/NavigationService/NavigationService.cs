@@ -11,7 +11,7 @@ public static class NavigationService
     };
 
     // 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18
-    public static Position GetNextNavigation(Entity entity, Match match)
+    public static Position GetNextNavigation(Entity entity, Match match, double deltaTime)
     {
         Position navTarget = GetNavigationTarget(entity, match);
 
@@ -20,7 +20,9 @@ public static class NavigationService
 
         double distance = Math.Sqrt(dx * dx + dy * dy);
 
-        if (distance <= 1.0)
+        double stepSize = entity.Speed * deltaTime;
+
+        if (distance <= stepSize || distance == 0)
         {
             return navTarget;
         }
@@ -28,7 +30,7 @@ public static class NavigationService
         double stepX = dx / distance;
         double stepY = dy / distance;
 
-        return new Position(entity.Pos.X + stepX, entity.Pos.Y + stepY);
+        return new Position(entity.Pos.X + stepX * stepSize, entity.Pos.Y + stepY * stepSize);
     }
 
     private static Entity GetClosestEnemyTower(Entity entity, Match match)

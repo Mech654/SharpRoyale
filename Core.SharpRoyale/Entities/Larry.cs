@@ -33,13 +33,7 @@ public class Larry(int owner, Match match) : Entity(owner, match.GetNextEntityId
 
     public override void Tick()
     {
-        MoveAccumulator += Speed * TickRate;
-
-        while (MoveAccumulator >= 1.0)
-        {
-            Position nextPos = NavigationService.GetNextNavigation(this, match);
-            ActionListService.AppendActionListMove(new ActionListValueMove(nextPos, this), match);
-            MoveAccumulator -= 1.0;
-        }
+        Position nextPos = NavigationService.GetNextNavigation(this, match, TickRate);
+        ActionListService.AppendActionListMove(new ActionListValueMove(nextPos, this), match);
     }
 }
