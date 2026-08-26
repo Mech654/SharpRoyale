@@ -35,7 +35,6 @@ public static class NavigationService
 
     private static Entity GetClosestEnemyTower(Entity entity, Match match)
     {
-        Console.WriteLine("GetClosestTowerTriggered");
         double closestDistanceSquared = double.MaxValue;
 
         Entity navTarget = entity;
@@ -44,6 +43,9 @@ public static class NavigationService
                 xEntity.EntityId is 1 or 2 && xEntity.Owner != entity.Owner
             )
             .ToList();
+
+        if (candidates.Count == 0)
+            throw new NotSupportedException();
 
         foreach (Entity tower in candidates)
         {
@@ -63,6 +65,7 @@ public static class NavigationService
 
     private static Position GetNavigationTarget(Entity entity, Match match)
     {
+        bool logs = false;
         double closestDistanceSquared = double.MaxValue;
 
         // TODO: Other factors such as enemy presence or other constructions will come above
@@ -102,102 +105,95 @@ public static class NavigationService
             }
         }
 
-        if (!IsPastBridges(entity))
+        if (!IsPastEnterBridgeTarget(entity))
         {
-            if (closestEntity is not null && IsPastBridges(closestEntity))
+            if (closestEntity is not null && IsPastExitBridgeTarget(closestEntity))
+            {
+                if (logs)
+                    Console.WriteLine(
+                        "Before bridge enter, enemy after exit bridge, going towards enemy"
+                    );
                 return GetCollisionPoint(entity, closestEntity);
+            }
+
+            if (logs)
+                Console.WriteLine("Before bridge enter, going to bridge enter");
             return GetEnterBridgeTarget(entity, closestBridge);
         }
 
-        if (IsPastBridges(entity))
+        if (IsPastEnterBridgeTarget(entity) && !IsPastExitBridgeTarget(entity))
         {
             if (closestEntity is not null)
             {
-                if (!IsPastBridges(closestEntity))
-                    return GetCollisionPoint(entity, closestEntity);
-                if (IsPastBridges(closestEntity))
+                if (IsPastEnterBridgeTarget(closestEntity))
                 {
-                    if (entity.IsMirrored)
-                    {
-                        Console.WriteLine("mirrored");
-                        if (entity.Pos.Y <= BridgePositions[0].Y + 2)
-                        {
-                            double bridgeDistance = GetDistanceToPosition(
-                                entity.Pos,
-                                GetEnterBridgeTarget(entity, closestBridge)
-                            );
-                            double enemyDistance = GetDistanceToPosition(
-                                entity.Pos,
-                                closestEntity.Pos
-                            );
+                    if (logs)
+                        Console.WriteLine(
+                            "Is past enter bridge but enemy too, going towards enemy"
+                        );
+                    return GetCollisionPoint(entity, closestEntity);
+                }
 
-                            if (enemyDistance <= bridgeDistance + 2)
-                                return GetCollisionPoint(entity, closestEntity);
-                            return GetEnterBridgeTarget(entity, closestBridge);
-                        }
-                    }
-
-                    if (!entity.IsMirrored)
-                    {
-                        if (entity.Pos.Y >= BridgePositions[0].Y - 2)
-                        {
-                            Console.WriteLine("not mirrored");
-                            double bridgeDistance = GetDistanceToPosition(
-                                entity.Pos,
-                                GetEnterBridgeTarget(entity, closestBridge)
-                            );
-                            double enemyDistance = GetDistanceToPosition(
-                                entity.Pos,
-                                closestEntity.Pos
-                            );
-
-                            if (enemyDistance <= bridgeDistance + 2)
-                                return GetCollisionPoint(entity, closestEntity);
-                            return GetEnterBridgeTarget(entity, closestBridge);
-                        }
-                    }
-
+                if (!IsPastEnterBridgeTarget(closestEntity))
+                {
+                    if (logs)
+                        Console.WriteLine(
+                            "Is past enter bridge, enemy not, going towards exit bridge"
+                        );
                     return GetExitBridgeTarget(entity, closestBridge);
                 }
-                // need to return closest bridge position
             }
+
+            if (logs)
+                Console.WriteLine("Is pas enter bridge, oging towards exit bridge");
+            return GetExitBridgeTarget(entity, closestBridge);
+        }
+
+        if (IsPastExitBridgeTarget(entity))
+        {
+            if (closestEntity is not null && !IsPastEnterBridgeTarget(closestEntity))
+            {
+                if (logs)
+                    Console.WriteLine(
+                        "Is Past Exit Bridge, enemy is not past enter bridge, going towards enemy"
+                    );
+                return GetCollisionPoint(entity, closestEntity);
+            }
+            if (logs)
+                Console.WriteLine("Is past exit bridge, going towards enemy tower");
             return GetCollisionPoint(entity, GetClosestEnemyTower(entity, match));
         }
 
-        return closestBridge;
+        // If all else fails
+        throw new NotImplementedException();
     }
 
-    private static bool IsPastBridges(Entity entity)
+    private static bool IsPastEnterBridgeTarget(Entity entity)
     {
         return entity.IsMirrored
-            ? entity.Pos.Y >= BridgePositions[0].Y - 2
-            : entity.Pos.Y <= BridgePositions[0].Y + 2;
+            ? entity.Pos.Y >= BridgePositions[0].Y - 1
+            : entity.Pos.Y <= BridgePositions[0].Y + 1;
+    }
+
+    private static bool IsPastExitBridgeTarget(Entity entity)
+    {
+        return entity.IsMirrored
+            ? entity.Pos.Y >= BridgePositions[0].Y + 1
+            : entity.Pos.Y <= BridgePositions[0].Y - 1;
     }
 
     private static Position GetExitBridgeTarget(Entity entity, Position bridgePosition)
     {
         return entity.IsMirrored
-            ? bridgePosition with
-            {
-                Y = bridgePosition.Y + 1,
-            }
-            : bridgePosition with
-            {
-                Y = bridgePosition.Y - 1,
-            };
+            ? new Position(entity.Pos.X, bridgePosition.Y + 1)
+            : new Position(entity.Pos.X, bridgePosition.Y - 1);
     }
 
     private static Position GetEnterBridgeTarget(Entity entity, Position bridgePosition)
     {
         return entity.IsMirrored
-            ? bridgePosition with
-            {
-                Y = bridgePosition.Y - 1,
-            }
-            : bridgePosition with
-            {
-                Y = bridgePosition.Y + 1,
-            };
+            ? new Position(bridgePosition.X, bridgePosition.Y - 1)
+            : new Position(bridgePosition.X, bridgePosition.Y + 1);
     }
 
     public static Entity MoveEntity(Entity entity, Position newPos)
@@ -211,39 +207,60 @@ public static class NavigationService
     {
         double dx = target.Pos.X - entity.Pos.X;
         double dy = target.Pos.Y - entity.Pos.Y;
-
         double distance = Math.Sqrt(dx * dx + dy * dy);
-
         if (distance == 0)
             return entity.Pos;
-
         double directionX = dx / distance;
         double directionY = dy / distance;
-
-        double collisionDistance;
-
+        double collisionDistance = Double.MaxValue;
         if (target.IsConstruction)
         {
-            // Distance from target center to its edge in the direction of the entity
             double halfWidth = target.Width / 2.0;
             double halfHeight = target.Height / 2.0;
 
-            double distanceX = halfWidth / Math.Abs(directionX);
-            double distanceY = halfHeight / Math.Abs(directionY);
+            double tEntryX,
+                tExitX;
+            if (Math.Abs(directionX) > 1e-9)
+            {
+                double t1 = ((target.Pos.X - halfWidth) - entity.Pos.X) / directionX;
+                double t2 = ((target.Pos.X + halfWidth) - entity.Pos.X) / directionX;
+                tEntryX = Math.Min(t1, t2);
+                tExitX = Math.Max(t1, t2);
+            }
+            else
+            {
+                tEntryX = Double.NegativeInfinity;
+                tExitX = Double.PositiveInfinity;
+            }
 
-            double targetEdgeDistance = Math.Min(distanceX, distanceY);
+            double tEntryY,
+                tExitY;
+            if (Math.Abs(directionY) > 1e-9)
+            {
+                double t1 = ((target.Pos.Y - halfHeight) - entity.Pos.Y) / directionY;
+                double t2 = ((target.Pos.Y + halfHeight) - entity.Pos.Y) / directionY;
+                tEntryY = Math.Min(t1, t2);
+                tExitY = Math.Max(t1, t2);
+            }
+            else
+            {
+                tEntryY = Double.NegativeInfinity;
+                tExitY = Double.PositiveInfinity;
+            }
 
-            // Entity is circular, so stop when its hitbox touches the construction.
-            collisionDistance = targetEdgeDistance - entity.HitboxRadius;
+            double tEntry = Math.Max(tEntryX, tEntryY);
+            double tExit = Math.Min(tExitX, tExitY);
+
+            if (tExit < tEntry || tExit < 0)
+                collisionDistance = distance;
+            else
+                collisionDistance = tEntry - entity.HitboxRadius;
         }
         else
         {
-            // Both entities have circular hitboxes.
             collisionDistance = distance - entity.HitboxRadius - target.HitboxRadius;
         }
-
         collisionDistance = Math.Max(collisionDistance, 0);
-
         return new Position(
             entity.Pos.X + directionX * collisionDistance,
             entity.Pos.Y + directionY * collisionDistance

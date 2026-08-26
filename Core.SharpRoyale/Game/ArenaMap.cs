@@ -32,22 +32,120 @@ public class ArenaMap
 
     public List<Entity> Entities { get; } = new();
 
+    private void Debug((Player p1, Player p2) players, Match match)
+    {
+        // P2 - top side
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(12, 1), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(8, 20), (int)EntityId.Larry, players.p2),
+            match
+        );
+        return;
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(6, 2), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(15, 4), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(3, 5), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(10, 8), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(1, 9), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(14, 10), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(7, 11), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(16, 13), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(4, 14), (int)EntityId.Larry, players.p2),
+            match
+        );
+
+        // P1 - bottom side
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(10, 18), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(2, 19), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(15, 20), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(6, 21), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(12, 23), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(1, 24), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(16, 26), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(8, 27), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(14, 29), (int)EntityId.Larry, players.p1),
+            match
+        );
+
+        ActionListService.AppendActionListSpawnSpecial(
+            new ActionListValueSpawn(new Position(4, 31), (int)EntityId.Larry, players.p1),
+            match
+        );
+    }
+
     public ArenaMap AddPlayerTowers((Player p1, Player p2) players, Match match)
     {
-        ActionListService.AppendActionListSpawnSpecial(
-            new ActionListValueSpawn(new Position(2, 25), (int)EntityId.Larry, players.p1),
-            match
-        );
-
-        ActionListService.AppendActionListSpawnSpecial(
-            new ActionListValueSpawn(new Position(12, 2), (int)EntityId.Larry, players.p2),
-            match
-        );
-
-        ActionListService.AppendActionListSpawnSpecial(
-            new ActionListValueSpawn(new Position(2, 5), (int)EntityId.Larry, players.p2),
-            match
-        );
+        Debug(players, match);
 
         ActionListService.AppendActionListSpawnSpecial(
             new ActionListValueSpawn(new Position(9, 30), (int)EntityId.King, players.p1),
