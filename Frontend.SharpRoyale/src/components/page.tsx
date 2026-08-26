@@ -41,7 +41,10 @@ async function RegisterUser(
       "atlas",
       "onyx",
     ];
-    return options[Math.floor(Math.random() * options.length)];
+    return (
+      options[Math.floor(Math.random() * options.length)] +
+      Math.floor(Math.random() * 1000)
+    );
   };
 
   const username = generateUsername();
