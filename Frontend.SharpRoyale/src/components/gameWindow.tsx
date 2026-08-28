@@ -1,7 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { connectToMatch } from "../services/WSconnection";
-import { renderFrame, setupCanvasResolution } from "../game/renderer";
+import {
+  renderFrame,
+  setupCanvasResolution,
+  TILE_COLS,
+  TILE_ROWS,
+} from "../game/renderer";
 import { applyMatchEvent } from "../services/gameEvents";
+import DeckContainer from "./deckContainer";
 
 interface GameWindowProps {
   matchId: number | null;
@@ -14,6 +20,10 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
   const [matchStatus, setMatchStatus] = useState("");
   const [isJoining, setIsJoining] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const activeCard = useRef<number | null>(null);
+  const previewTile = useRef<{ x: number; y: number; valid: boolean } | null>(
+    null,
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -21,22 +31,16 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // initial sizing
     setupCanvasResolution(canvas);
-
-    // keep it in sync with layout changes
-    const observer = new ResizeObserver(() => {
-      setupCanvasResolution(canvas);
-    });
+    const observer = new ResizeObserver(() => setupCanvasResolution(canvas));
     observer.observe(canvas);
 
     let frameId: number;
     const loop = () => {
-      renderFrame(ctx);
+      renderFrame(ctx, activeCard.current, previewTile.current);
       frameId = requestAnimationFrame(loop);
     };
     frameId = requestAnimationFrame(loop);
-
     return () => cancelAnimationFrame(frameId);
   }, []);
 
@@ -45,6 +49,44 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
     const cleanup = connectToMatch(matchId, applyMatchEvent);
     return cleanup;
   }, [matchId]);
+
+  const onPointerMove = (e: PointerEvent) => {
+    const canvas = canvasRef.current;
+    if (!canvas || activeCard.current == null) return;
+    console.error("moving", activeCard.current);
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const gridX = Math.floor((x / rect.width) * TILE_COLS) + 0.5;
+    const gridY = Math.floor((y / rect.height) * TILE_ROWS) + 0.5;
+
+    previewTile.current = {
+      x: gridX,
+      y: gridY,
+      valid: true, // TODO: Implement placement validation logic
+    };
+  };
+
+  const onPointerUp = () => {
+    window.removeEventListener("pointermove", onPointerMove);
+
+    if (previewTile.current?.valid && activeCard.current != null) {
+      //sendPlacement(activeCard.current, previewTile.current);
+    }
+
+    activeCard.current = null;
+    previewTile.current = null;
+  };
+
+  const handleCardPointerDown = (cardId: number, e: React.PointerEvent) => {
+    console.error("pointer down", cardId); // <-- add this
+    e.currentTarget.setPointerCapture(e.pointerId);
+    activeCard.current = cardId;
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp, { once: true });
+  };
 
   return (
     <div className="game-window">
@@ -61,6 +103,7 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
           Join Before Its Too Late!!!
         </button>
       )}
+      <DeckContainer onCardPointerDown={handleCardPointerDown} />
     </div>
   );
 };

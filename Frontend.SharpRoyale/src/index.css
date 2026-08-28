@@ -28,7 +28,9 @@ header {
   margin-top: 100px;
   background-color: #1f4d3a;
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: center;
   box-shadow:
     0 0 0 4px #6b4423,
     0 8px 20px rgba(0, 0, 0, 0.4);
@@ -36,7 +38,6 @@ header {
 .game-window canvas {
   width: 100%;
   height: 100%;
-  position: absolute;
   inset: 0;
 }
 .game-window p {
@@ -44,9 +45,13 @@ header {
   z-index: 3;
   color: #f0e2c0;
 }
+
 .join-match-button {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   z-index: 1;
-  margin-top: 40%;
   padding: 10px 20px;
   height: fit-content;
   width: fit-content;
@@ -59,6 +64,40 @@ header {
   transition:
     transform 0.1s ease,
     background-color 0.1s ease;
+}
+
+.deck-container {
+  width: 100%;
+  height: 10%;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 10px;
+  background-color: #3e2a17;
+}
+
+.card {
+  margin-right: 10px;
+  width: 17%;
+  height: 120%;
+  background-color: #4a4a4a;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.entity-shape {
+  flex-shrink: 0;
+}
+
+.entity-shape--rect {
+  border-radius: 4px;
+}
+
+.entity-shape--circle {
+  border-radius: 50%;
 }
 
 .join-match-button:hover {

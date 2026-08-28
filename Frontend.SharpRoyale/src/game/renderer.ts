@@ -1,10 +1,15 @@
+import { useRef } from "react";
 import { gameState } from "./gameState";
 import { ENTITY_DATA } from "./EntityData";
 
-const TILE_COLS = 18;
-const TILE_ROWS = 32;
+export const TILE_COLS = 18;
+export const TILE_ROWS = 32;
 
-export function renderFrame(ctx: CanvasRenderingContext2D) {
+export function renderFrame(
+  ctx: CanvasRenderingContext2D,
+  activeCard: number | null,
+  previewTile: { x: number; y: number; valid: boolean } | null,
+) {
   const canvas = ctx.canvas;
   const canvasWidth = canvas.clientWidth; // logical/CSS pixels
   const canvasHeight = canvas.clientHeight;
@@ -16,6 +21,19 @@ export function renderFrame(ctx: CanvasRenderingContext2D) {
   renderTiles(ctx, tileWidth, tileHeight, canvasWidth, canvasHeight);
   renderTickText(ctx, gameState.tickId);
   renderEntities(ctx, tileWidth, tileHeight);
+
+  // Prview Tile
+  if (activeCard != null && previewTile != null) {
+    const px = previewTile.x * tileWidth;
+    const py = previewTile.y * tileHeight;
+
+    ctx.beginPath();
+    ctx.arc(px, py, 20, 0, Math.PI * 2);
+    ctx.fillStyle = previewTile.valid
+      ? "rgba(0,255,0,0.4)"
+      : "rgba(255,0,0,0.4)";
+    ctx.fill();
+  }
 }
 
 export function setupCanvasResolution(canvas: HTMLCanvasElement) {
