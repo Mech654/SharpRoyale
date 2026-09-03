@@ -5,17 +5,17 @@ namespace Core.SharpRoyale.GameServices.UserInteractionService;
 
 public static class UserInteractionService
 {
-    public static void ApplyUserInteraction(UserInteractionElement userInteractionElement)
+    public static void AppendUserInteraction(UserInteractionElement userInteractionElement)
     {
         switch (userInteractionElement.action)
         {
             case UserInteractionOption.Spawn:
-                ApplyUserSpawnAction(userInteractionElement);
+                AppendUserSpawnAction(userInteractionElement);
                 break;
         }
     }
 
-    private static void ApplyUserSpawnAction(UserInteractionElement userInteractionElement)
+    private static void AppendUserSpawnAction(UserInteractionElement userInteractionElement)
     {
         int? entityId = userInteractionElement.values.EntityId;
         if (entityId is null)
