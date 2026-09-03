@@ -14,7 +14,6 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
 
     public void AppendUserInteractionList(UserInteractionElement userInteraction)
     {
-        var time = DateTime.Now;
         UserInteractionList.Add(userInteraction);
     }
 
@@ -45,6 +44,8 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
             {
                 UserInteractionService.AppendUserInteraction(userInteraction);
             }
+
+            UserInteractionList.Clear();
 
             // Collect Action
             foreach (Entity entity in m.Map.Entities)

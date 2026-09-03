@@ -135,7 +135,7 @@ public static class ActionListService
     {
         if (actionElement.Values is not ActionListValueSpawn val)
         {
-            return;
+            throw new InvalidOperationException();
         }
         Entity? success = SpawnService.SpawnService.SpawnSingularEntity(
             val.EntityId,
@@ -143,6 +143,8 @@ public static class ActionListService
             match,
             val.Position
         );
+
+        Console.WriteLine($"success is: {success}");
 
         if (success is not null)
         {

@@ -12,12 +12,14 @@ public static class SpawnService
         Position position
     )
     {
+        /*
         if (!player.Deck.AvailableEntities.Contains(entityId))
             return null;
         if (!match.Map.CheckIfEntityCanBeDeployed(entityId, position, match))
             return null;
         if (!(player.Elixir >= -1)) //TODO
             return null;
+        */
 
         Entity entity = DeckService.DeckService.GetEntityFromId(entityId, player.Id, match);
         entity.IsMirrored = player.IsMirrored;

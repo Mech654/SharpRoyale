@@ -9,18 +9,12 @@ namespace Web.SharpRoyale.Hubs;
 [Authorize]
 public class MatchHub(MatchService matchService) : Hub
 {
-    private int? _player; //TODO: Should this really be a Player? or just int...
-    private int? _matchId;
-
     public override async Task OnConnectedAsync()
     {
-        _player = GetPlayerId(Context.User);
-
         var matchId = GetMatchIdFromRoute(Context.GetHttpContext());
         if (!matchService.CheckMatchExists(matchId))
             throw new HubException("match_not_found");
 
-        _matchId = matchId;
         await Groups.AddToGroupAsync(Context.ConnectionId, $"match:{matchId}");
 
         await base.OnConnectedAsync();
@@ -30,7 +24,6 @@ public class MatchHub(MatchService matchService) : Hub
     {
         if (matchService.CheckMatchExists(matchId))
         {
-            _matchId = matchId;
         }
 
         return Task.CompletedTask;
@@ -68,19 +61,28 @@ public class MatchHub(MatchService matchService) : Hub
         UserInteractionOption? userInteractionOption = MatchUserInteractionOption(action);
 
         if (userInteractionOption == null)
+        {
+            Console.WriteLine("FAILED UI OPTION");
             return Result.Fail("Invalid Action Option");
-        if (_player == null)
+        }
+
+        if (GetPlayerId(Context.User) <= 0)
+        {
+            Console.WriteLine($"player is {GetPlayerId(Context.User)}");
+            Console.WriteLine("player not assigned");
             return Result.Fail("Player not assigned");
-        if (_matchId == null)
+        }
+        if (GetMatchIdFromRoute(Context.GetHttpContext()) <= 0)
             return Result.Fail("Match not assigned");
 
         matchService.SendPlayerActionToEngine(
-            _matchId.Value,
-            _player.Value,
+            GetMatchIdFromRoute(Context.GetHttpContext()),
+            GetPlayerId(Context.User),
             userInteractionOption.Value,
             values
         );
 
+        Console.WriteLine("SEND USER ACTION!!!");
         return Result.Ok();
     }
 

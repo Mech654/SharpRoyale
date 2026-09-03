@@ -17,7 +17,7 @@ public static class UserInteractionService
 
     private static void AppendUserSpawnAction(UserInteractionElement userInteractionElement)
     {
-        int? entityId = userInteractionElement.values.EntityId;
+        int? entityId = userInteractionElement.values.GetProperty("entityId").GetInt32();
         if (entityId is null)
             return;
 
@@ -25,10 +25,15 @@ public static class UserInteractionService
         Player player = match.GetPlayerFromId(userInteractionElement.playerid);
         Entity entity = DeckService.DeckService.GetEntityFromId(entityId.Value, player.Id, match);
 
+        var position = userInteractionElement.values.GetProperty("Position");
+
         ActionListService.ActionListService.AppendActionListSpawn(
             new ActionListValueSpawn(
-                new Position(0, 0),
-                userInteractionElement.values.EntityId,
+                new Position(
+                    position.GetProperty("x").GetDouble(),
+                    position.GetProperty("y").GetDouble()
+                ),
+                userInteractionElement.values.GetProperty("entityId").GetInt32(),
                 player
             ),
             match
