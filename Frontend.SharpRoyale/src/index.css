@@ -105,7 +105,6 @@ header {
 }
 
 .join-match-button:active {
-  transform: scale(0.96) translateY(1px);
   background-color: #a8721f;
 }
 

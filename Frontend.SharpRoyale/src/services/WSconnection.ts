@@ -1,12 +1,14 @@
 import { HubConnectionBuilder, HubConnection } from "@microsoft/signalr";
 import type { MatchEvent } from "./gameEvents";
 
+let connection: HubConnection | null = null;
+
 export function connectToMatch(
   matchId: number,
   onEvent: (data: MatchEvent) => void,
 ): () => void {
   console.log("Connecting to match with ID:", matchId);
-  const connection: HubConnection = new HubConnectionBuilder()
+  connection = new HubConnectionBuilder()
     .withUrl(`http://localhost:5182/hubs/match/${matchId}`)
     .withAutomaticReconnect()
     .build();
@@ -23,6 +25,22 @@ export function connectToMatch(
     .catch((err) => console.error("SignalR connection failed:", err));
 
   return () => {
-    connection.stop();
+    connection?.stop();
   };
+}
+
+export interface SpawnActionValues {
+  entityId: number;
+  Position: { x: number; y: number };
+}
+
+export function sendSpawnAction(action: string, values: SpawnActionValues) {
+  if (!connection) {
+    console.error("SignalR connection is not established.");
+    return;
+  }
+
+  connection
+    .invoke("SendPlayerAction", action, values)
+    .catch((err) => console.error("Error sending spawn action:", err));
 }

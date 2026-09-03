@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { connectToMatch } from "../services/WSconnection";
+import { sendSpawnAction } from "../services/gameRequests";
 import {
   renderFrame,
   setupCanvasResolution,
@@ -8,6 +9,7 @@ import {
 } from "../game/renderer";
 import { applyMatchEvent } from "../services/gameEvents";
 import DeckContainer from "./deckContainer";
+import { getCardEntityId } from "../services/deckService";
 
 interface GameWindowProps {
   matchId: number | null;
@@ -53,7 +55,6 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
   const onPointerMove = (e: PointerEvent) => {
     const canvas = canvasRef.current;
     if (!canvas || activeCard.current == null) return;
-    console.error("moving", activeCard.current);
 
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -73,7 +74,21 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
     window.removeEventListener("pointermove", onPointerMove);
 
     if (previewTile.current?.valid && activeCard.current != null) {
-      //sendPlacement(activeCard.current, previewTile.current);
+      let entityId = getCardEntityId(activeCard.current);
+      if (entityId == null) {
+        console.error("Invalid card ID:", activeCard.current);
+        return;
+      }
+      sendSpawnAction("Spawn", {
+        entityId: entityId,
+        Position: { x: previewTile.current.x, y: previewTile.current.y },
+      });
+      console.info(
+        "Spawn action sent for entityId:",
+        entityId,
+        "at position:",
+        previewTile.current,
+      );
     }
 
     activeCard.current = null;
@@ -81,7 +96,7 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
   };
 
   const handleCardPointerDown = (cardId: number, e: React.PointerEvent) => {
-    console.error("pointer down", cardId); // <-- add this
+    console.log("pointer down", cardId);
     e.currentTarget.setPointerCapture(e.pointerId);
     activeCard.current = cardId;
     window.addEventListener("pointermove", onPointerMove);
