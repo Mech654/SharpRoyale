@@ -34,14 +34,16 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
         DeployPlayerDecks(m.Players.p1, m.Players.p2, m);
 
         await Task.Delay(5000);
+        DebugHelper.StartTime(20);
         while (true)
         {
+            if (DebugHelper.IsOverLimit()) break;
             var sw = Stopwatch.StartNew();
 
-            // Apply User Actions TODO: Should only append ... fix
+            // Append User Actions to ActionListService
             foreach (UserInteractionElement userInteraction in UserInteractionList)
             {
-                UserInteractionService.ApplyUserInteraction(userInteraction);
+                UserInteractionService.AppendUserInteraction(userInteraction);
             }
 
             // Collect Action
@@ -67,5 +69,6 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
             if (elapsed < msPerTick)
                 await Task.Delay((int)(msPerTick - elapsed));
         }
+        Console.WriteLine($"Total Ticks: {tickId}");
     }
 }
