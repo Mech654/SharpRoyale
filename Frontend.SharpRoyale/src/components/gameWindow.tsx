@@ -17,6 +17,7 @@ interface GameWindowProps {
 }
 
 let eventSource: EventSource | null = null;
+let autoJoin: Boolean = true;
 
 const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
   const [matchStatus, setMatchStatus] = useState("");
@@ -26,6 +27,13 @@ const GameWindow = ({ matchId, setMatchId }: GameWindowProps) => {
   const previewTile = useRef<{ x: number; y: number; valid: boolean } | null>(
     null,
   );
+
+  useEffect(() => {
+    if (autoJoin) {
+      autoJoin = false;
+      handleJoinMatchClick(setMatchId, setMatchStatus, setIsJoining);
+    }
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
