@@ -27,6 +27,10 @@ public class Match
     {
         if (Players.p1.Id == id)
             return Players.p1;
-        return Players.p2;
+        else if (Players.p2.Id == id)
+            return Players.p2;
+        else
+            Environment.FailFast($"Player with ID {id} does not exist in this match.");
+        return null;
     }
 }

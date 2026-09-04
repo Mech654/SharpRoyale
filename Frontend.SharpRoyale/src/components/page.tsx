@@ -4,10 +4,15 @@ import GameWindow from "./gameWindow";
 function Page() {
   const [registerResult, setRegisterResult] = useState<string>("");
   const [matchId, setMatchId] = useState<number | null>(null);
+  const [ready, setReady] = useState<boolean>(false);
+  let didRegister = false;
 
   useEffect(() => {
+    if (didRegister) return;
+    didRegister = true;
     (async () => {
       await RegisterUser(setRegisterResult);
+      setReady(true);
     })();
   }, []);
 
@@ -15,7 +20,7 @@ function Page() {
     <>
       <header>{registerResult}</header>
       <div className="page">
-        <GameWindow matchId={matchId} setMatchId={setMatchId} />
+        {ready && <GameWindow matchId={matchId} setMatchId={setMatchId} />}
       </div>
     </>
   );
