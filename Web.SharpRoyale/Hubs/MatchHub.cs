@@ -59,6 +59,7 @@ public class MatchHub(MatchService matchService) : Hub
     public Result SendPlayerAction(string action, object values)
     {
         UserInteractionOption? userInteractionOption = MatchUserInteractionOption(action);
+        int playerId = GetPlayerId(Context.User);
 
         if (userInteractionOption == null)
         {
@@ -66,7 +67,7 @@ public class MatchHub(MatchService matchService) : Hub
             return Result.Fail("Invalid Action Option");
         }
 
-        if (GetPlayerId(Context.User) <= 0)
+        if (playerId <= 0)
         {
             Console.WriteLine($"player is {GetPlayerId(Context.User)}");
             Console.WriteLine("player not assigned");
@@ -77,12 +78,11 @@ public class MatchHub(MatchService matchService) : Hub
 
         matchService.SendPlayerActionToEngine(
             GetMatchIdFromRoute(Context.GetHttpContext()),
-            GetPlayerId(Context.User),
+            playerId,
             userInteractionOption.Value,
             values
         );
 
-        Console.WriteLine("SEND USER ACTION!!!");
         return Result.Ok();
     }
 

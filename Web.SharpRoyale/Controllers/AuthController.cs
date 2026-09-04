@@ -26,7 +26,7 @@ public class AuthController(TokenService tokenService) : ControllerBase
     [HttpPost("register")]
     public IActionResult Register([FromBody] Models.RegisterDTO request)
     {
-        // We assume a successful db registation here and proceed
+        // We assume a successful db registration here and proceed
         var token = tokenService.GenerateToken(request.Username);
         Response.Cookies.Append("access_token", token, new CookieOptions
         {

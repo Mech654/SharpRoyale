@@ -145,7 +145,7 @@ public class ArenaMap
 
     public ArenaMap AddPlayerTowers((Player p1, Player p2) players, Match match)
     {
-        Debug(players, match);
+        //Debug(players, match);
 
         ActionListService.AppendActionListSpawnSpecial(
             new ActionListValueSpawn(new Position(9, 30), (int)EntityId.King, players.p1),

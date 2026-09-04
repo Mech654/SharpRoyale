@@ -144,8 +144,6 @@ public static class ActionListService
             val.Position
         );
 
-        Console.WriteLine($"success is: {success}");
-
         if (success is not null)
         {
             match.ActionListResult.Add(

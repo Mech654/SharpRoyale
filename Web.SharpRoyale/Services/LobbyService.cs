@@ -18,7 +18,7 @@ public class LobbyService
         _queue.TryDequeue(out _);
 
     }
-    // TODO: Implement Better Matchmaking Logic, Elo Based.
+    
     public bool TryMatching(out (Player p1, Player p2)? match)
     {
         lock (_lock)
@@ -32,6 +32,7 @@ public class LobbyService
             if (_queue.TryDequeue(out var p1) &&
                 _queue.TryDequeue(out var p2))
             {
+                Console.WriteLine($"Making a match with players p1: {p1} and p2: {p2}");
                 match = (DbHelper.GetPlayerFromId(p1), DbHelper.GetPlayerFromId(p2));
                 return true;
             }

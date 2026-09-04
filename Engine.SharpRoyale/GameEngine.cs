@@ -36,7 +36,7 @@ public class GameEngine(TickClientFeedback tickClientFeedback)
         DebugHelper.StartTime(20);
         while (true)
         {
-            if (DebugHelper.IsOverLimit()) break;
+            //if (DebugHelper.IsOverLimit()) break;
             var sw = Stopwatch.StartNew();
 
             // Append User Actions to ActionListService
